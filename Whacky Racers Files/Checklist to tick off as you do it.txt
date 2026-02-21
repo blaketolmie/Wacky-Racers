@@ -1,0 +1,15 @@
+To dos:
+(use a x when its done)
+
+-- Robot Check List --
+Battery System For Robot -
+FPV radio For Robot -
+H-Bridge Motor Control For Robot -
+LED strip for Robot -
+Radio control for Robot -
+
+-- Hat Check List --
+Battery System For Hat - 
+IMU for Hat - 
+LED strip for Hat -
+Radio control for Hat -
