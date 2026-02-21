@@ -1,0 +1,2 @@
+Same as 2022 RUL file
+2025 Reduced track thickness and clearances so routing between 0603 pads can occur. This may be required if routing diff pair from USB-type C - AFTER the 27R terminating R's going on to uC.
