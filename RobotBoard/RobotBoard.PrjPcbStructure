@@ -1,1 +1,4 @@
-Record=TopLevelDocument|FileName=RobotBoard.SchDoc|SheetNumber=1
+Record=TopLevelDocument|FileName=HatBoard.SchDoc|SheetNumber=3
+Record=SheetSymbol|SourceDocument=HatBoard.SchDoc|Designator=U_HatPower|SchDesignator=U_HatPower|FileName=HatPower.SchDoc|SheetNumber=4|SymbolType=Normal|RawFileName=HatPower.SchDoc|DesignItemId= |SourceLibraryName= |ObjectKind=Sheet Symbol|RevisionGUID= |ItemGUID= |VaultGUID= 
+Record=NoMainPathDocument|SourceDocument=HatBoard.SchDoc|FileName=RobotBoard.SchDoc|SheetNumber=1
+Record=NoMainPathDocument|SourceDocument=HatBoard.SchDoc|FileName=RobotPower.SchDoc|SheetNumber=2
