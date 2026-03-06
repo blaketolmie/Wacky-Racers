@@ -1,1 +1,2 @@
 Record=TopLevelDocument|FileName=HatBoard.SchDoc|SheetNumber=1
+Record=SheetSymbol|SourceDocument=HatBoard.SchDoc|Designator=U_HatPower|SchDesignator=U_HatPower|FileName=HatPower.SchDoc|SheetNumber=2|SymbolType=Normal|RawFileName=HatPower.SchDoc|DesignItemId= |SourceLibraryName= |ObjectKind=Sheet Symbol|RevisionGUID= |ItemGUID= |VaultGUID= 
