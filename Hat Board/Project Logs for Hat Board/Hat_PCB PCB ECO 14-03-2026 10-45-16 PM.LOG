@@ -1,0 +1,7 @@
+Change Component Comment : Designator=GND Old Comment=TP New Comment=0R
+Change Component Kind : Designator=GND Old Kind=Standard (No BOM) New Kind=Standard
+Change component parameters: Designator = "GND" ("GND"); Footprint = "Axial 0.6"; UniqueID = "\ULXUJYTT" ("\ULXUJYTT")
+Change component parameters (AddParameter): Name = "Storage Location"; Value = "PCB Assembly WS"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Supplier"; Value = "ECE Dept"; VariantName = "[No Variations]"
+Change component parameters (AddParameter): Name = "Value"; Value = "0R"; VariantName = "[No Variations]"
+Added Pin To Net: NetName=GND Pin=GND-2

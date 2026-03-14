@@ -1,0 +1,42 @@
+Removed Pin From Net: NetName=VDD 5V Pin=C53-1
+Removed Pin From Net: NetName=VDD 5V Pin=C54-1
+Removed Pin From Net: NetName=VDD 5V Pin=L6-2
+Removed Pin From Net: NetName=VDD 5V Pin=R14-1
+Removed Pin From Net: NetName=NetH6_2 Pin=TP9-1
+Removed Pin From Net: NetName=NetD3_2 Pin=TP11-1
+Removed Pin From Net: NetName=VDD 5V Pin=TP14-1
+Removed Pin From Net: NetName=VDD 5V Pin=U15-5
+Removed Member From Class: ClassName=U_HatPower Member=TP9
+Removed Member From Class: ClassName=U_HatPower Member=TP11
+Change Component Designator: OldDesignator=TP6 NewDesignator=IMU_INT1
+Change Component Designator: OldDesignator=TP7 NewDesignator=IMU_INT2
+Change Component Designator: OldDesignator=TP8 NewDesignator=LED_STRIP_SIG
+Change Component Designator: OldDesignator=TP12 NewDesignator=3V3
+Change Component Designator: OldDesignator=TP13 NewDesignator=ERASE
+Change Component Designator: OldDesignator=TP14 NewDesignator=VDD_5V
+Added Component: Designator=VBATT(TP_1206)
+Add component (AddParameter): Name = "Manufacturer"; Value = "Harwin Inc"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Manufacturer Part Number"; Value = "S1751-46R"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Manufacturer PN"; Value = ""; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Mounting Type"; Value = "Surface Mount"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Price"; Value = ""; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Storage Location"; Value = "ProtoPlace"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Supplier"; Value = "ECE Dept"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Supplier 1"; Value = "Digi-Key"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Supplier 2"; Value = "Farnell"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Supplier Part Number 1"; Value = "952-1478-2-ND"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Supplier Part Number 2"; Value = "1826282"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Type"; Value = "PC Test Point"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Value"; Value = "TP"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Verify"; Value = ""; VariantName = "[No Variations]"
+Added Pin To Net: NetName=VBATT Pin=VBATT-1
+Change Net Name : Old Net Name=NetTP13_1 New Net Name=NetERASE_1
+Added Pin To Net: NetName=NetC53_1 Pin=C53-1
+Added Pin To Net: NetName=NetC53_1 Pin=C54-1
+Added Pin To Net: NetName=NetC53_1 Pin=L6-2
+Added Pin To Net: NetName=NetC53_1 Pin=R14-1
+Added Pin To Net: NetName=NetC53_1 Pin=U15-5
+Added Pin To Net: NetName=NetC53_1 Pin=VDD_5V-1
+Added Net: Name=NetC53_1
+Added Member To Class: ClassName=U_HatPower Member=Component VBATT TP
+Added Rule: Name=Schematic Supply Nets_4

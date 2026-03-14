@@ -1,0 +1,30 @@
+Removed Pin From Net: NetName=SWCLK Pin=TP1-1
+Removed Member From Class: ClassName=HatBoard Member=TP1
+Change Component Designator: OldDesignator=TP2 NewDesignator=SWDIO
+Change Component Designator: OldDesignator=TP3 NewDesignator=LED_STRIP
+Change Component Designator: OldDesignator=TP4 NewDesignator=BUZZ_PWR
+Change Component Designator: OldDesignator=TP5 NewDesignator=BUZZ_GND
+Added Component: Designator=SWCLK?(TP_1206)
+Add component (AddParameter): Name = "Manufacturer"; Value = "Harwin Inc"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Manufacturer Part Number"; Value = "S1751-46R"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Manufacturer PN"; Value = ""; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Mounting Type"; Value = "Surface Mount"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Price"; Value = ""; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Storage Location"; Value = "ProtoPlace"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Supplier"; Value = "ECE Dept"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Supplier 1"; Value = "Digi-Key"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Supplier 2"; Value = "Farnell"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Supplier Part Number 1"; Value = "952-1478-2-ND"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Supplier Part Number 2"; Value = "1826282"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Type"; Value = "PC Test Point"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Value"; Value = "TP"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Verify"; Value = ""; VariantName = "[No Variations]"
+Added Pin To Net: NetName=SWCLK Pin=SWCLK?-1
+Change Net Name : Old Net Name=NetP1_1 New Net Name=NetBUZZ_PWR_1
+Change Net Name : Old Net Name=NetP1_2 New Net Name=NetBUZZ_GND_1
+Added Member To Class: ClassName=U_HatPower Member=Component R18 1R
+Added Member To Class: ClassName=HatBoard Member=Component SWCLK? TP
+Added Rule: Name=Schematic Supply Nets
+Added Rule: Name=Schematic Supply Nets_1
+Added Rule: Name=Schematic Supply Nets_2
+Added Rule: Name=Schematic Supply Nets_3

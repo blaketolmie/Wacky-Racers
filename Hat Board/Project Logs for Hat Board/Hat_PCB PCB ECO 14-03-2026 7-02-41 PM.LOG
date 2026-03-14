@@ -1,0 +1,11 @@
+Change Component Designator: OldDesignator=TP1 NewDesignator=SWCLK?
+Change Component Designator: OldDesignator=TP2 NewDesignator=SWDIO
+Change Component Designator: OldDesignator=TP4 NewDesignator=BUZZ_PWR
+Change Component Designator: OldDesignator=TP5 NewDesignator=BUZZ_GND
+Change Net Name : Old Net Name=NetP1_1 New Net Name=NetBUZZ_PWR_1
+Change Net Name : Old Net Name=NetP1_2 New Net Name=NetBUZZ_GND_1
+Added Member To Class: ClassName=U_HatPower Member=Component R18 1R
+Added Rule: Name=Schematic Supply Nets
+Added Rule: Name=Schematic Supply Nets_1
+Added Rule: Name=Schematic Supply Nets_2
+Added Rule: Name=Schematic Supply Nets_3
