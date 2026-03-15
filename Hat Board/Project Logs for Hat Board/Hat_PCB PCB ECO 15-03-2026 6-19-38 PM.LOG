@@ -1,0 +1,4 @@
+Removed Pin From Net: NetName=IMU_OFF Pin=U13-14
+Removed Pin From Net: NetName=USB_DETECT Pin=U13-35
+Added Pin To Net: NetName=USB_DETECT Pin=U13-14
+Added Pin To Net: NetName=IMU_OFF Pin=U13-33
