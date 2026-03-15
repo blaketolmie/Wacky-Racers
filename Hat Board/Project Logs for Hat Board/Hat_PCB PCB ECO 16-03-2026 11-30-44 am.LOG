@@ -1,0 +1,28 @@
+Added Component: Designator=MT?(MNT-HOLE_3.2mm_NPTH)
+Add component (AddParameter): Name = "Manufacturer"; Value = "Hi-Q"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Manufacturer PN"; Value = "3BV series M3 Clearance"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "note"; Value = ""; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "price"; Value = "0"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Supplier"; Value = "ECE Dept"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "value"; Value = "M3.2 NPTH"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Verify"; Value = ""; VariantName = "[No Variations]"
+Added Component: Designator=MT?(MNT-HOLE_3.2mm_NPTH)
+Add component (AddParameter): Name = "Manufacturer"; Value = "Hi-Q"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Manufacturer PN"; Value = "3BV series M3 Clearance"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "note"; Value = ""; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "price"; Value = "0"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Supplier"; Value = "ECE Dept"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "value"; Value = "M3.2 NPTH"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Verify"; Value = ""; VariantName = "[No Variations]"
+Added Component: Designator=MT?(MNT-HOLE_3.2mm_NPTH)
+Add component (AddParameter): Name = "Manufacturer"; Value = "Hi-Q"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Manufacturer PN"; Value = "3BV series M3 Clearance"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "note"; Value = ""; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "price"; Value = "0"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Supplier"; Value = "ECE Dept"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "value"; Value = "M3.2 NPTH"; VariantName = "[No Variations]"
+Add component (AddParameter): Name = "Verify"; Value = ""; VariantName = "[No Variations]"
+Added Differential Pair: Name=D
+Added Member To Class: ClassName=HatBoard Member=Component MT? M3.2 NPTH
+Added Member To Class: ClassName=HatBoard Member=Component MT? M3.2 NPTH
+Added Member To Class: ClassName=HatBoard Member=Component MT? M3.2 NPTH
