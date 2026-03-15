@@ -1,0 +1,12 @@
+Removed Pin From Net: NetName=nRST Pin=S1-2
+Removed Pin From Net: NetName=SLEEP Pin=S2-2
+Removed Pin From Net: NetName=STAT3 Pin=U13-37
+Removed Pin From Net: NetName=STAT2 Pin=U13-38
+Added Pin To Net: NetName=STAT3 Pin=U13-13
+Added Pin To Net: NetName=STAT2 Pin=U13-16
+Added Pin To Net: NetName=BUTTON_1 Pin=S1-2
+Added Pin To Net: NetName=BUTTON_1 Pin=U13-38
+Added Net: Name=BUTTON_1
+Added Pin To Net: NetName=BUTTON_2 Pin=S2-2
+Added Pin To Net: NetName=BUTTON_2 Pin=U13-37
+Added Net: Name=BUTTON_2
