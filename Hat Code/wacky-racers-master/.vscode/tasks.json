@@ -1,0 +1,145 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build",
+            "type": "shell",
+            "windows": {
+                "command": "${config:windowsToolchainEnvCmd} && make -j",
+                "options": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": [ "/d", "/c" ]
+                    }
+                }
+            },
+            "command": "make -j",
+            "options": {
+                "cwd": "${fileDirname}",
+                "env": {
+                    "BOARD": "${command:cpptools.activeConfigName}"
+                }
+            },
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Bootflash",
+            "type": "shell",
+            "windows": {
+                "command": "${config:windowsToolchainEnvCmd} && make -j bootflash",
+                "options": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": [ "/d", "/c" ]
+                    }
+                }
+            },
+            "command": "make -j bootflash",
+            "options": {
+                "cwd": "${fileDirname}",
+                "env": {
+                    "BOARD": "${command:cpptools.activeConfigName}"
+                }
+            },
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Clean",
+            "type": "shell",
+            "command": "make clean",
+            "windows": {
+                "command": "${config:windowsToolchainEnvCmd} && make clean",
+                "options": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": [ "/d", "/c" ]
+                    }
+                }
+            },
+            "options": {
+                "cwd": "${fileDirname}",
+                "env": {
+                    "BOARD": "${command:cpptools.activeConfigName}"
+                }
+            },
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Program",
+            "type": "shell",
+            "command": "make -j program",
+            "windows": {
+                "command": "${config:windowsToolchainEnvCmd} && make -j program",
+                "options": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": [ "/d", "/c" ]
+                    }
+                }
+            },
+            "options": {
+                "cwd": "${fileDirname}",
+                "env": {
+                    "BOARD": "${command:cpptools.activeConfigName}"
+                }
+            },
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Debug (command line)",
+            "type": "shell",
+            "command": "make -j debug",
+            "windows": {
+                "command": "${config:windowsToolchainEnvCmd} && make -j debug",
+                "options": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": [ "/d", "/c" ]
+                    }
+                }
+            },
+            "options": {
+                "cwd": "${fileDirname}",
+                "env": {
+                    "BOARD": "${command:cpptools.activeConfigName}"
+                }
+            },
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Launch OpenOCD",
+            "type": "shell",
+            "command": "openocd -f \"${workspaceFolder}/src/mat91lib/sam4s/scripts/sam4s_stlink.cfg\"",
+            "windows": {
+                "command": "${config:windowsToolchainEnvCmd} && openocd -f \"${workspaceFolder}/src/mat91lib/sam4s/scripts/sam4s_stlink.cfg\"",
+                "options": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": [ "/d", "/c" ]
+                    }
+                }
+            },
+            "options": {
+                "cwd": "${fileDirname}",
+                "env": {
+                    "BOARD": "${command:cpptools.activeConfigName}"
+                }
+            },
+            "group": "build",
+            "problemMatcher": []
+        }
+    ]
+}

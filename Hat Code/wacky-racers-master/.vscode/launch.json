@@ -1,0 +1,55 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "inputs": [
+        {
+            "id": "windowsPathELF",
+            "type": "command",
+            "command": "extension.commandvariable.transform",
+            "args": {
+                "text": "${fileDirname}\\build\\app.elf",
+                "find": "\\\\",
+                "replace": "\\\\\\\\",
+                "flags": "g"
+            }
+        }
+    ],
+    "configurations": [
+        {
+            "name": "Debug",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${fileDirname}/build/app.elf",
+            "cwd": "${fileDirname}",
+            "MIMode": "gdb",
+            "miDebuggerPath": "gdb-multiarch",
+            "preLaunchTask": "Build",
+            "customLaunchSetupCommands": [],
+            "setupCommands": [
+                {"text": "target remote tcp:localhost:3333", "description": ""},
+                {"text": "symbol-file \"${fileDirname}/build/app.elf\"", "description": ""},
+                {"text": "load \"${fileDirname}/build/app.elf\"", "description": ""},
+                {"text": "break main", "description": ""},
+                {"text": "monitor reset halt", "description": ""}
+            ],
+            "launchCompleteCommand": "None",
+            "externalConsole": false,
+            "windows": {
+                "miDebuggerPath": "C:\\ence461\\tool-chain\\gcc-arm-none-eabi-9-2019-q4\\bin\\arm-none-eabi-gdb.exe",
+                "targetArchitecture": "arm",
+                "setupCommands": [
+                    {"text": "target remote tcp:localhost:3333", "description": ""},
+                    {"text": "symbol-file \"${input:windowsPathELF}\"", "description": ""},
+                    {"text": "load \"${input:windowsPathELF}\"", "description": ""},
+                    {"text": "break main", "description": ""},
+                    {"text": "monitor reset halt", "description": ""}
+                ]
+            },
+            "osx": {
+                "miDebuggerPath": "arm-none-eabi-gdb"
+            }
+        }
+    ]
+}

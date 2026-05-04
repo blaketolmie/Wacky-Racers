@@ -1,0 +1,39 @@
+{
+    "configurations": [
+        {
+            "name": "hat",
+            "intelliSenseMode": "gcc-arm",
+            "compilerPath": "",
+            "defines": [
+                "BOARD=hat",
+                "MCU=SAM4S8B",
+                "__SAM4S8B__",
+                "__SAM4S__"
+            ],
+            "includePath": [
+                "${workspaceFolder}/src/boards/hat",
+                "${workspaceFolder}/src/mat91lib/sam4s/**",
+                "${workspaceFolder}/src/mat91lib/**",
+                "${workspaceFolder}/src/mmculib/**"
+            ]
+        },
+        {
+            "name": "racer",
+            "intelliSenseMode": "gcc-arm",
+            "compilerPath": "",
+            "defines": [
+                "BOARD=racer",
+                "MCU=SAM4S8B",
+                "__SAM4S8B__",
+                "__SAM4S__"
+            ],
+            "includePath": [
+                "${workspaceFolder}/src/boards/racer",
+                "${workspaceFolder}/src/mat91lib/sam4s/**",
+                "${workspaceFolder}/src/mat91lib/**",
+                "${workspaceFolder}/src/mmculib/**"
+            ]
+        }
+    ],
+    "version": 4
+}
