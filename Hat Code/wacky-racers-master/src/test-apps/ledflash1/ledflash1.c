@@ -23,7 +23,8 @@ main (void)
 
     /* Configure STATUS LED PIO as output and set high.  The LED should
        turn on if wired active-high.  */
-    pio_config_set (LED_STATUS_PIO, PIO_OUTPUT_HIGH);
+    pio_config_set (LED_ERROR_PIO, PIO_OUTPUT_LOW);
+    pio_config_set (LED_STATUS_PIO, PIO_OUTPUT_LOW);
 
     pacer_init (PACER_RATE);
 
@@ -39,7 +40,8 @@ main (void)
             ticks = 0;
 
             /* Toggle LED.  */
-            pio_output_toggle (LED_STATUS_PIO);
+            pio_output_toggle (LED_ERROR_PIO);
+            pio_output_toggle (LED_RED_PIO);
         }
     }
 }

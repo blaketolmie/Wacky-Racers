@@ -9,11 +9,7 @@ int main (void)
 {
     int i = 0;
 
-    pio_config_set (LED_STATUS_PIO, PIO_OUTPUT_LOW);
-    pio_output_set (LED_STATUS_PIO, LED_ACTIVE);
 
-    pio_config_set (LED_ERROR_PIO, PIO_OUTPUT_LOW);
-    pio_output_set (LED_ERROR_PIO, ! LED_ACTIVE);
 
     // Redirect stdio to USB serial
     usb_serial_stdio_init ();
