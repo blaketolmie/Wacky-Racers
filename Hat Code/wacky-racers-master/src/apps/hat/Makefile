@@ -1,5 +1,5 @@
 PERIPHERALS = pit
-DRIVERS =
+DRIVERS = usb_serial pacer
 SRC = hat.c
 
 # Use low level of optimisation to simplify debugging

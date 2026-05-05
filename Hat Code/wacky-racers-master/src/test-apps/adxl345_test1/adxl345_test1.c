@@ -10,6 +10,7 @@
 #include "usb_serial.h"
 #include "adxl345.h"
 #include "panic.h"
+#include "mcu.h"
 
 /*
  * NOTE: you must define ADXL345_ADDRESS in target.h for this to compile.
@@ -19,7 +20,7 @@
 #endif
 
 #define PACER_RATE 20
-#define ACCEL_POLL_RATE 1
+#define ACCEL_POLL_RATE 10
 
 static twi_cfg_t adxl345_twi_cfg =
 {
@@ -32,6 +33,8 @@ static twi_cfg_t adxl345_twi_cfg =
 int
 main (void)
 {
+    mcu_jtag_disable ();
+
     twi_t adxl345_twi;
     adxl345_t *adxl345;
     int ticks = 0;
@@ -44,19 +47,26 @@ main (void)
     pio_output_set (LED_ERROR_PIO, ! LED_ACTIVE);
     pio_config_set (LED_STATUS_PIO, PIO_OUTPUT_LOW);
     pio_output_set (LED_STATUS_PIO, ! LED_ACTIVE);
+    pio_config_set (LED_RED_PIO, PIO_OUTPUT_LOW);
+    pio_output_set (LED_RED_PIO, ! LED_ACTIVE);
+    pio_config_set (LED_GREEN_PIO, PIO_OUTPUT_LOW);
+    pio_output_set (LED_GREEN_PIO, ! LED_ACTIVE);
+
+    pio_config_set (IMU_OFF, PIO_OUTPUT_HIGH);  // power on the IMU
+    delay_ms (100);                             // wait for power to stabilise
+
 
     // Initialise the TWI (I2C) bus for the ADXL345
     adxl345_twi = twi_init (&adxl345_twi_cfg);
 
     if (! adxl345_twi)
-        panic (LED_ERROR_PIO, 1);
+        panic (LED_RED_PIO, 1);
 
     // Initialise the ADXL345
     adxl345 = adxl345_init (adxl345_twi, ADXL345_ADDRESS);
 
     if (! adxl345)
-        panic (LED_ERROR_PIO, 2);
-
+        panic (LED_GREEN_PIO, 2);
     pacer_init (PACER_RATE);
 
     while (1)

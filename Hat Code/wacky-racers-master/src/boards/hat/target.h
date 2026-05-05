@@ -37,12 +37,15 @@
 /* IMU  */
 #define IMU_INT1_PIO PA31_PIO
 #define IMU_INT2_PIO PA30_PIO
+#define ADXL345_ADDRESS 0x1D        //0x1D or 0x53
+#define IMU_OFF PB4_PIO
 
 /* LEDs  */
 #define LED_ERROR_PIO PA0_PIO //STAT0
 #define LED_STATUS_PIO PA1_PIO //STAT1
 #define LED_RED_PIO PA20_PIO //STAT2
 #define LED_GREEN_PIO PA19_PIO //STAT3
+#define LED_ACTIVE 0 //active low
 
 /* General  */
 #define APPENDAGE_PIO PA1_PIO
