@@ -44,9 +44,9 @@ int main(void)
     // Redirect stdio to USB serial.
     usb_serial_stdio_init ();
 
-#ifdef RADIO_POWER_ENABLE_PIO
+#ifdef RADIO_OFF_PIO
     // Enable radio regulator if present.
-    pio_config_set (RADIO_POWER_ENABLE_PIO, PIO_OUTPUT_HIGH);
+    pio_config_set (RADIO_OFF_PIO, PIO_OUTPUT_LOW);
     delay_ms (10);
 #endif
 

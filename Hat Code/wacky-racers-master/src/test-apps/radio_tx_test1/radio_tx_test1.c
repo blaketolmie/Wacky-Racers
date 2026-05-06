@@ -41,9 +41,9 @@ int main (void)
     pio_config_set (LED_STATUS_PIO, PIO_OUTPUT_HIGH);
     pacer_init (10);
 
-#ifdef RADIO_POWER_ENABLE_PIO
+#ifdef RADIO_OFF_PIO
     // Enable radio regulator if present.
-    pio_config_set (RADIO_POWER_ENABLE_PIO, PIO_OUTPUT_HIGH);
+    pio_config_set (RADIO_OFF_PIO, PIO_OUTPUT_LOW);
     delay_ms (10);
 #endif
 

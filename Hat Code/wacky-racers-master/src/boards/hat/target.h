@@ -71,4 +71,10 @@
 /* LED tape  */
 #define LEDTAPE_PIO PA11_PIO
 
+/* Throttle & Steering */
+#define SCALE_NUM_X 2.6f
+#define SCALE_NUM_Y 2.6f
+
+
+
 #endif /* TARGET_H  */
