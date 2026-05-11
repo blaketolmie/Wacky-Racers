@@ -71,6 +71,9 @@
 /* LED tape  */
 #define LEDTAPE_PIO PA11_PIO
 
+/* Buck Converter */
+#define PGOOD_PIO PB3_PIO
+
 /* Throttle & Steering */
 #define SCALE_NUM_X 2.6f
 #define SCALE_NUM_Y 2.6f

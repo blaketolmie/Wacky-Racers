@@ -9,7 +9,7 @@
 #include "delay.h"
 #include "panic.h"
 
-#define RADIO_CHANNEL 4
+#define RADIO_CHANNEL 5
 #define RADIO_ADDRESS 0x0123456789LL
 #define RADIO_PAYLOAD_SIZE 32
 
@@ -38,15 +38,16 @@ int main(void)
     nrf24_t *nrf;
 
     // Configure LED PIO as output.
-    pio_config_set (LED_ERROR_PIO, PIO_OUTPUT_LOW);
-    pio_config_set (LED_STATUS_PIO, PIO_OUTPUT_HIGH);
+    pio_config_set (LED_ERROR_PIO, PIO_OUTPUT_HIGH);
+    pio_config_set (LED_STATUS_PIO, PIO_OUTPUT_LOW);
+    pio_config_set (PGOOD_PIO, PIO_INPUT);
 
     // Redirect stdio to USB serial.
     usb_serial_stdio_init ();
 
 #ifdef RADIO_OFF_PIO
     // Enable radio regulator if present.
-    pio_config_set (RADIO_OFF_PIO, PIO_OUTPUT_LOW);
+    pio_config_set (RADIO_OFF_PIO, PIO_OUTPUT_HIGH);
     delay_ms (10);
 #endif
 
