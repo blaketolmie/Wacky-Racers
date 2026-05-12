@@ -40,10 +40,11 @@ int main(void)
     // Configure LED PIO as output.
     pio_config_set (LED_ERROR_PIO, PIO_OUTPUT_HIGH);
     pio_config_set (LED_STATUS_PIO, PIO_OUTPUT_LOW);
-    pio_config_set (PGOOD_PIO, PIO_INPUT);
+    pio_config_set (BUZZER_PIO, PIO_OUTPUT_LOW);
 
     // Redirect stdio to USB serial.
     usb_serial_stdio_init ();
+    delay_ms(200);
 
 #ifdef RADIO_OFF_PIO
     // Enable radio regulator if present.
@@ -54,6 +55,12 @@ int main(void)
     nrf = nrf24_init (&nrf24_cfg);
     if (! nrf)
         panic (LED_ERROR_PIO, 2);
+    delay_ms(500);
+
+    printf("CE=%d IRQ=%d PGOOD=%d\n",
+        pio_input_get(RADIO_CE_PIO),
+        pio_input_get(RADIO_IRQ_PIO),
+        pio_input_get(PGOOD_PIO));
 
     while(1)
     {

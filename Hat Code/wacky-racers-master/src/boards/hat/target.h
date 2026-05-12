@@ -78,6 +78,9 @@
 #define SCALE_NUM_X 2.6f
 #define SCALE_NUM_Y 2.6f
 
+/* Buzzer */
+#define BUZZER_PIO PA17_PIO
+
 
 
 #endif /* TARGET_H  */
