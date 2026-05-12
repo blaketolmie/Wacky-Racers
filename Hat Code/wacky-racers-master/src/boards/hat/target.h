@@ -81,6 +81,9 @@
 /* Buzzer */
 #define BUZZER_PIO PA17_PIO
 
+/* Pacer */
+#define PACER_RATE 20
+
 
 
 #endif /* TARGET_H  */
