@@ -7,7 +7,7 @@
 #include "panic.h"
 #include "target.h"
 #include "hat_radio.h"
-#include "pwm_sequence.h"
+#include "control_logic.h"
 
 #define PACER_RATE 10
 #define TX_TICKS PACER_RATE
@@ -23,12 +23,11 @@ static void print_startup(void)
 int main(void)
 {
     nrf24_t *nrf;
-    pwm_sequence_t sequence;
     bool stop_received = false;
     uint8_t ticks = 0;
 
-    pio_config_set(LED_STATUS_PIO, PIO_OUTPUT_LOW);
-    pio_config_set(LED_ERROR_PIO, PIO_OUTPUT_LOW);
+    pio_config_set(LED_STATUS_PIO, LED_ACTIVE);
+    pio_config_set(LED_ERROR_PIO, !LED_ACTIVE);
 
     usb_serial_stdio_init();
 
@@ -36,7 +35,7 @@ int main(void)
     if (! nrf)
         panic(LED_ERROR_PIO, 2);
 
-    pwm_sequence_init(&sequence);
+    imu_init();
     pacer_init(PACER_RATE);
 
     print_startup();
@@ -61,12 +60,10 @@ int main(void)
         ticks++;
         if (ticks >= TX_TICKS)
         {
-            int left_pwm;
-            int right_pwm;
-
+            int left_pwm, right_pwm;
+            get_pwm(&left_pwm, &right_pwm);
+            printf("Left = %d    Right = %d\n", left_pwm, right_pwm);
             ticks = 0;
-            left_pwm = pwm_sequence_next(&sequence);
-            right_pwm = left_pwm;
 
             if (! hat_radio_pwm_send(nrf, left_pwm, right_pwm))
             {

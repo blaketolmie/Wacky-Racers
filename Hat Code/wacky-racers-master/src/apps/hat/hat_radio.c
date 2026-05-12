@@ -6,7 +6,7 @@
 #include "delay.h"
 #include "target.h"
 
-#define RADIO_CHANNEL 5
+#define RADIO_CHANNEL 2
 #define RADIO_ADDRESS 0x0123456789LL
 #define STOP_MESSAGE "STOP"
 
