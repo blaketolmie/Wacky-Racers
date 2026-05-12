@@ -22,7 +22,7 @@
 #error ADXL345_ADDRESS must be defined
 #endif
 
-#define PACER_RATE 20
+
 #define ACCEL_POLL_RATE 10
 
 static twi_cfg_t adxl345_twi_cfg =
