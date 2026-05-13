@@ -20,16 +20,19 @@ static void print_startup(void)
     fflush(stdout);
 }
 
+#define LED_FLASH_RATE 2
+
 int main(void)
 {
     nrf24_t *nrf;
     bool stop_received = false;
     uint8_t ticks = 0;
     int ticks_remaining = 0;
+    int led_ticks = 0;
 
 
-    pio_config_set(LED_STATUS_PIO, LED_ACTIVE);
-    pio_config_set(LED_ERROR_PIO, !LED_ACTIVE);
+    pio_config_set(LED_STATUS_PIO, PIO_OUTPUT_LOW);
+    pio_config_set(LED_ERROR_PIO, PIO_OUTPUT_HIGH);
 
     usb_serial_stdio_init();
 
@@ -44,6 +47,13 @@ int main(void)
 
     while (1)
     {
+        led_ticks ++;
+
+        if (led_ticks >= PACER_RATE / LED_FLASH_RATE / 2)
+        {
+            pio_output_toggle(LED_STATUS_PIO);
+            led_ticks = 0;
+        }
         char buffer[RADIO_PAYLOAD_SIZE + 1];
 
         pacer_wait();
@@ -69,12 +79,12 @@ int main(void)
 
             if (! hat_radio_pwm_send(nrf, left_pwm, right_pwm))
             {
-                pio_output_set(LED_ERROR_PIO, 1);
+                pio_output_set(LED_ERROR_PIO, LED_ACTIVE);
                 printf("TX failed: %d %d\r\n", left_pwm, right_pwm);
             }
             else
             {
-                pio_output_set(LED_ERROR_PIO, 0);
+                pio_output_set(LED_ERROR_PIO, !LED_ACTIVE);
                 printf("TX pwm: %d %d\r\n", left_pwm, right_pwm);
             }
 
