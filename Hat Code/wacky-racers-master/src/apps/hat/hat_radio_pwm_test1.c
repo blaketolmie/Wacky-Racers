@@ -8,8 +8,8 @@
 #include "target.h"
 #include "hat_radio.h"
 #include "control_logic.h"
+#include "bumper_hit.h"
 
-#define PACER_RATE 10
 #define TX_TICKS PACER_RATE
 
 static void print_startup(void)
@@ -25,6 +25,8 @@ int main(void)
     nrf24_t *nrf;
     bool stop_received = false;
     uint8_t ticks = 0;
+    int ticks_remaining = 0;
+
 
     pio_config_set(LED_STATUS_PIO, LED_ACTIVE);
     pio_config_set(LED_ERROR_PIO, !LED_ACTIVE);
@@ -62,7 +64,7 @@ int main(void)
         {
             int left_pwm, right_pwm;
             get_pwm(&left_pwm, &right_pwm);
-            printf("Left = %d    Right = %d\n", left_pwm, right_pwm);
+            // printf("Left = %d    Right = %d\n", left_pwm, right_pwm);
             ticks = 0;
 
             if (! hat_radio_pwm_send(nrf, left_pwm, right_pwm))
@@ -77,8 +79,17 @@ int main(void)
             }
 
             if (stop_received)
-                pio_output_toggle(LED_STATUS_PIO);
-
+            {
+                if (ticks_remaining == 0){
+                    bumper_hit_start();
+                }
+                ticks_remaining = bumper_hit_update();
+                printf("ticks remaining = %d\r\n", ticks_remaining);
+                if (ticks_remaining == 0)
+                {
+                    stop_received = 0;
+                }
+            }
             fflush(stdout);
         }
     }
