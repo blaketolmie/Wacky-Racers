@@ -17,6 +17,12 @@ void bumper_hit_start(void)
     pio_config_set(LED_RED_PIO, LED_ACTIVE);
 }
 
+void bumper_hit_stop(void)
+{
+    pio_config_set(LED_RED_PIO, !LED_ACTIVE);
+    pwm_stop(buzzer_pwm);
+}
+
 // Call once per pacer tick. Returns 1 while active, 0 when done.
 int bumper_hit_update(void)
 {

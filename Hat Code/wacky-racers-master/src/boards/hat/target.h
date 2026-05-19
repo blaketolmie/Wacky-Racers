@@ -82,7 +82,9 @@
 #define BUZZER_PIO PA17_PIO
 
 /* Pacer */
-#define PACER_RATE 20
+#define PACER_RATE 100
+// #define TX_TICKS 2
+
 
 
 
