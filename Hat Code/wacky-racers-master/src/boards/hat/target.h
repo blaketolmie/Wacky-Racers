@@ -70,7 +70,7 @@
 
 /* LED tape  */
 #define LEDTAPE_PIO PA11_PIO
-#define NUM_LEDS 21
+#define NUM_LEDS 22
 
 /* Buck Converter */
 #define PGOOD_PIO PB3_PIO

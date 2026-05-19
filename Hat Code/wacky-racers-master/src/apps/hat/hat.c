@@ -27,7 +27,7 @@ static void print_startup(void)
 #define BLINKY_FREQUENCY 2
 #define TRANSMIT_PWM_FREQUENCY 5
 #define BUMPER_HIT_DURATION 5
-#define LED_STRIP_FREQUENCY 2
+#define LED_STRIP_FREQUENCY 50
 #define LOW_VOLTAGE_FREQUENCY 1
 
 // task ticks 
@@ -57,6 +57,7 @@ int main(void)
     bool stop_received = false;
     bool blue = false;
 
+    
 
 
     // Initialisation
@@ -72,6 +73,8 @@ int main(void)
     ledbuffer_t *leds = ledbuffer_init (LEDTAPE_PIO, NUM_LEDS);
     init_low_voltage();
 
+    static int led_pos = 0;
+    static int led_pos2 = NUM_LEDS / 2; //start the second led on the other side
 
     print_startup();
 
@@ -135,26 +138,26 @@ int main(void)
             fflush(stdout);
         }
 
-        if (led_strip_ticks++ == NUM_LEDS)
+        if (led_strip_ticks++ >= LED_STRIP_TICKS)
         {
             // wait for a revolution
             ledbuffer_clear(leds);
-            if (blue)
-            {
-                ledbuffer_set(leds, 0, 0, 0, 255);
-                ledbuffer_set(leds, NUM_LEDS / 2, 0, 0, 255);
-            }
-            else
-            {
-                ledbuffer_set(leds, 0, 255, 0, 0);
-                ledbuffer_set(leds, NUM_LEDS / 2, 255, 0, 0);
-            }
-            blue = !blue;
+            ledbuffer_set(leds, (led_pos - 1 + NUM_LEDS) % NUM_LEDS, 0,0,10);
+            ledbuffer_set(leds, led_pos, 0,0,255);
+            ledbuffer_set(leds, (led_pos + 1) % NUM_LEDS, 0,0,10);
+
+            ledbuffer_set(leds, (led_pos2 - 1 + NUM_LEDS) % NUM_LEDS, 10,0,0);
+            ledbuffer_set(leds, led_pos2, 255,0,0);
+            ledbuffer_set(leds, (led_pos2 + 1) % NUM_LEDS, 10,0,0);
+
+            ledbuffer_write(leds);
+
+            led_pos = (led_pos + 1) % NUM_LEDS;
+            led_pos2 = (led_pos2 - 1 + NUM_LEDS) % NUM_LEDS;
             led_strip_ticks = 0;
         }
 
-        ledbuffer_write (leds);
-        ledbuffer_advance (leds, 1);
+
 
         // Low Voltage
         if (low_voltage_ticks++ >= LOW_VOLTAGE_TICKS)
