@@ -9,8 +9,6 @@
 #include "pacer.h"
 #include "ledbuffer.h"
 
-#define NUM_LEDS 15
-
 /*
     This is an alternative method for driving the LED tape using the ledbuffer
     module that is included in the ledtape driver.

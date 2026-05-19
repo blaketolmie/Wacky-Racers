@@ -24,7 +24,8 @@ main (void)
     /* Configure STATUS LED PIO as output and set high.  The LED should
        turn on if wired active-high.  */
     pio_config_set (LED_ERROR_PIO, PIO_OUTPUT_LOW);
-    pio_config_set (LED_STATUS_PIO, PIO_OUTPUT_LOW);
+    pio_config_set (LED_RED_PIO, PIO_OUTPUT_LOW);
+    int toggle = 0;
 
     pacer_init (PACER_RATE);
 
@@ -32,16 +33,26 @@ main (void)
     {
         /* Wait until next clock tick.  */
         pacer_wait ();
-
         ticks++;
 
         if (ticks >= PACER_RATE / LED_FLASH_RATE / 2)
         {
             ticks = 0;
 
-            /* Toggle LED.  */
-            pio_output_toggle (LED_ERROR_PIO);
-            pio_output_toggle (LED_RED_PIO);
+            // /* Toggle LED.  */
+            // pio_output_toggle (LED_ERROR_PIO);
+            // pio_output_toggle (LED_RED_PIO);
+            
+            if (toggle)
+            {
+                pio_output_set(LED_RED_PIO, LED_ACTIVE);
+                toggle = 0;
+            }
+            else
+            {
+                pio_output_set(LED_RED_PIO, (!LED_ACTIVE));
+                toggle = 1;
+            }
         }
     }
 }

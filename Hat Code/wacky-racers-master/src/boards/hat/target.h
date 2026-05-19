@@ -70,6 +70,7 @@
 
 /* LED tape  */
 #define LEDTAPE_PIO PA11_PIO
+#define NUM_LEDS 21
 
 /* Buck Converter */
 #define PGOOD_PIO PB3_PIO
@@ -83,9 +84,6 @@
 
 /* Pacer */
 #define PACER_RATE 100
-// #define TX_TICKS 2
-
-
 
 
 #endif /* TARGET_H  */

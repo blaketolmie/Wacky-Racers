@@ -14,12 +14,12 @@ void bumper_hit_start(void)
         buzzer_pwm = pwm_init(&(pwm_cfg_t){.pio = BUZZER_PIO, .frequency = 1000, .duty_ppt = 500});
     pwm_start(buzzer_pwm);
     ticks_remaining = BUMPER_HIT_DURATION_TICKS;
-    pio_config_set(LED_RED_PIO, LED_ACTIVE);
+    pio_config_set(LED_GREEN_PIO, LED_ACTIVE);
 }
 
 void bumper_hit_stop(void)
 {
-    pio_config_set(LED_RED_PIO, !LED_ACTIVE);
+    pio_config_set(LED_GREEN_PIO, !LED_ACTIVE);
     pwm_stop(buzzer_pwm);
 }
 
@@ -31,7 +31,7 @@ int bumper_hit_update(void)
     //     return 0;
     // }
 
-    pio_output_toggle(LED_RED_PIO);
+    pio_output_toggle(LED_GREEN_PIO);
 
     if (ticks_remaining % (PACER_RATE / 4) < (PACER_RATE / 8))
     {

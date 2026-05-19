@@ -9,8 +9,6 @@
 #include "pacer.h"
 #include "ledtape.h"
 
-#define NUM_LEDS 20
-
 /*
     This test app shows how to program the WS2318B LED tape.
     In this example the ledtape_write() function is used to send the appropriate
@@ -50,8 +48,8 @@ main (void)
     for (i = 0; i < NUM_LEDS; i++)
     {
         // Set full green  GRB order
-        leds[i * 3] = 255;
-        leds[i * 3 + 1] = 0;
+        leds[i * 3] = 0;
+        leds[i * 3 + 1] = 255;
         leds[i * 3 + 2] = 0;
     }
 
