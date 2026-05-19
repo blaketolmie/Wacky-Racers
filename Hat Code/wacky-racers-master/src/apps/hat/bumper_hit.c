@@ -1,54 +1,60 @@
+#include <stdbool.h>
 #include "pio.h"
 #include "pwm.h"
 #include "target.h"
 #include "bumper_hit.h"
+#include "ledbuffer.h"
 
-#define BUMPER_HIT_DURATION_TICKS 3  // 2 seconds
+// sad trombone — Bb4, A4, Ab4, Eb4 (each note repeated for duration)
+static const uint16_t jingle[] = {466, 466, 440, 440, 415, 415, 311, 311, 311, 311};
+#define NUM_NOTES (sizeof(jingle) / sizeof(jingle[0]))
+#define NOTE_TICKS   15     // ticks per note step
+#define BUMPER_DURATION_TICKS (NUM_NOTES * NOTE_TICKS)
 
-static int ticks_remaining = 0;
+static int ticks = 0;
+static bool active = false;
 static pwm_t buzzer_pwm;
+
+bool bumper_hit_is_active(void)
+{
+    return active;
+}
 
 void bumper_hit_start(void)
 {
     if (!buzzer_pwm)
-        buzzer_pwm = pwm_init(&(pwm_cfg_t){.pio = BUZZER_PIO, .frequency = 1000, .duty_ppt = 500});
+        buzzer_pwm = pwm_init(&(pwm_cfg_t){.pio = BUZZER_PIO, .frequency = 466, .duty_ppt = 500});
+    ticks = 0;
+    active = true;
     pwm_start(buzzer_pwm);
-    ticks_remaining = BUMPER_HIT_DURATION_TICKS;
-    pio_config_set(LED_GREEN_PIO, LED_ACTIVE);
 }
 
 void bumper_hit_stop(void)
 {
-    pio_config_set(LED_GREEN_PIO, !LED_ACTIVE);
+    active = false;
     pwm_stop(buzzer_pwm);
 }
 
-// Call once per pacer tick. Returns 1 while active, 0 when done.
-int bumper_hit_update(void)
+void bumper_hit_update(ledbuffer_t *leds)
 {
-    // if (ticks_remaining == 0)
-    // {
-    //     return 0;
-    // }
+    if (!active)
+        return;
 
-    pio_output_toggle(LED_GREEN_PIO);
+    // step through jingle notes
+    int note_index = (ticks / NOTE_TICKS) % NUM_NOTES;
+    pwm_frequency_set(buzzer_pwm, jingle[note_index]);
+    pwm_duty_ppt_set(buzzer_pwm, 500);
 
-    if (ticks_remaining % (PACER_RATE / 4) < (PACER_RATE / 8))
+    // flash all LEDs red, blink every 10 ticks
+    ledbuffer_clear(leds);
+    if ((ticks / 10) % 2 == 0)
     {
-        pwm_duty_ppt_set(buzzer_pwm, 100);
+        for (int i = 0; i < NUM_LEDS; i++)
+            ledbuffer_set(leds, i, 255, 0, 0);
     }
-    else
-    {
-        pwm_duty_ppt_set(buzzer_pwm, 500);
-    }
+    ledbuffer_write(leds);
 
-    ticks_remaining--;
-
-    if (ticks_remaining == 0)
-    {
-        pio_config_set(LED_RED_PIO, !LED_ACTIVE);
-        pwm_stop(buzzer_pwm);
-    }
-
-    return ticks_remaining; //> 0 ? 1 : 0;
+    ticks++;
+    if (ticks >= BUMPER_DURATION_TICKS)
+        bumper_hit_stop();
 }

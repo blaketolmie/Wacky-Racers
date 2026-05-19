@@ -26,7 +26,6 @@ static void print_startup(void)
 #define CHANNEL_CHECK_FREQUENCY 1
 #define BLINKY_FREQUENCY 2
 #define TRANSMIT_PWM_FREQUENCY 5
-#define BUMPER_HIT_DURATION 5
 #define LED_STRIP_FREQUENCY 50
 #define LOW_VOLTAGE_FREQUENCY 1
 
@@ -34,7 +33,6 @@ static void print_startup(void)
 #define CHANNEL_CHECK_TICKS (PACER_RATE/CHANNEL_CHECK_FREQUENCY)
 #define BLINKY_TICKS (PACER_RATE/BLINKY_FREQUENCY)
 #define TRANSMIT_PWM_TICKS (PACER_RATE/TRANSMIT_PWM_FREQUENCY)
-#define BUMPER_HIT_DURATION_TICKS (PACER_RATE*BUMPER_HIT_DURATION)
 #define LED_STRIP_TICKS (PACER_RATE/LED_STRIP_FREQUENCY)
 #define LOW_VOLTAGE_TICKS (PACER_RATE/LOW_VOLTAGE_FREQUENCY)
 
@@ -48,14 +46,10 @@ int main(void)
     int channel_check_ticks = 0;
     int blinky_ticks = 0;
     int transmit_pwm_ticks = 0;
-    int bumper_hit_ticks = 0;
     int led_strip_ticks = 0;
     int low_voltage_ticks = 0;
 
-    // Variables
     nrf24_t *nrf;
-    bool stop_received = false;
-    bool blue = false;
 
     
 
@@ -63,6 +57,7 @@ int main(void)
     // Initialisation
     pio_config_set(LED_STATUS_PIO, PIO_OUTPUT_LOW);
     pio_config_set(LED_ERROR_PIO, PIO_OUTPUT_HIGH);
+    pio_config_set(BUTTON_1_PIO, PIO_PULLUP);   // button for testing bumper hit
     usb_serial_stdio_init();
     nrf = hat_radio_init();
     if (! nrf)
@@ -103,19 +98,13 @@ int main(void)
         {
             printf("RX: %s\r\n", buffer);
             if (hat_radio_stop_received(buffer))
-            {
-                bumper_hit_ticks = 0;
                 bumper_hit_start();
-                // printf("STOP received\r\n");
-            }
             fflush(stdout);
         }
 
-        if (bumper_hit_ticks++ >= BUMPER_HIT_DURATION_TICKS)
-        {
-            bumper_hit_stop();
-            bumper_hit_ticks = 0;
-        }
+        // button press triggers bumper hit for testing
+        if (!pio_input_get(BUTTON_1_PIO) && !bumper_hit_is_active())
+            bumper_hit_start();
 
         // TX PWM values over radio
         if (transmit_pwm_ticks++ >= TRANSMIT_PWM_TICKS)
@@ -138,17 +127,21 @@ int main(void)
             fflush(stdout);
         }
 
-        if (led_strip_ticks++ >= LED_STRIP_TICKS)
+        // bumper hit takes over the LED strip while active
+        if (bumper_hit_is_active())
         {
-            // wait for a revolution
+            bumper_hit_update(leds);
+        }
+        else if (led_strip_ticks++ >= LED_STRIP_TICKS)
+        {
             ledbuffer_clear(leds);
-            ledbuffer_set(leds, (led_pos - 1 + NUM_LEDS) % NUM_LEDS, 0,0,10);
-            ledbuffer_set(leds, led_pos, 0,0,255);
-            ledbuffer_set(leds, (led_pos + 1) % NUM_LEDS, 0,0,10);
+            ledbuffer_set(leds, (led_pos - 1 + NUM_LEDS) % NUM_LEDS, 0, 0, 10);
+            ledbuffer_set(leds, led_pos, 0, 0, 255);
+            ledbuffer_set(leds, (led_pos + 1) % NUM_LEDS, 0, 0, 10);
 
-            ledbuffer_set(leds, (led_pos2 - 1 + NUM_LEDS) % NUM_LEDS, 10,0,0);
-            ledbuffer_set(leds, led_pos2, 255,0,0);
-            ledbuffer_set(leds, (led_pos2 + 1) % NUM_LEDS, 10,0,0);
+            ledbuffer_set(leds, (led_pos2 - 1 + NUM_LEDS) % NUM_LEDS, 10, 0, 0);
+            ledbuffer_set(leds, led_pos2, 255, 0, 0);
+            ledbuffer_set(leds, (led_pos2 + 1) % NUM_LEDS, 10, 0, 0);
 
             ledbuffer_write(leds);
 
