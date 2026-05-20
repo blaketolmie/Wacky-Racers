@@ -12,6 +12,7 @@
 #include "radio_channel.h"
 #include "ledbuffer.h"
 #include "low_voltage.h"
+#include "mcu_sleep.h"
 
 
 static void print_startup(void)
@@ -57,7 +58,8 @@ int main(void)
     // Initialisation
     pio_config_set(LED_STATUS_PIO, PIO_OUTPUT_LOW);
     pio_config_set(LED_ERROR_PIO, PIO_OUTPUT_HIGH);
-    pio_config_set(BUTTON_1_PIO, PIO_PULLUP);   // button for testing bumper hit
+    pio_config_set(BUTTON_1_PIO, PIO_PULLUP);
+    pio_config_set(BUTTON_SLEEP_PIO, PIO_PULLUP);
     usb_serial_stdio_init();
     nrf = hat_radio_init();
     if (! nrf)
@@ -102,16 +104,54 @@ int main(void)
             fflush(stdout);
         }
 
-        // button press triggers bumper hit for testing
+        // button 1 triggers bumper hit for testing
         if (!pio_input_get(BUTTON_1_PIO) && !bumper_hit_is_active())
             bumper_hit_start();
 
-        // TX PWM values over radio
+        // sleep button: shut everything down and wait for wakeup
+        if (!pio_input_get(BUTTON_SLEEP_PIO))
+        {
+            // send zero PWM so the car stops
+            hat_radio_pwm_send(nrf, 0, 0);
+
+            // power down peripherals
+            bumper_hit_stop();
+            ledbuffer_clear(leds);
+            ledbuffer_write(leds);
+            pio_config_set(RADIO_OFF_PIO, PIO_OUTPUT_LOW);
+            pio_config_set(IMU_OFF, PIO_OUTPUT_LOW);
+
+            static const mcu_sleep_wakeup_t wakeups[] = {
+                {.pio = BUTTON_SLEEP_PIO, .active_high = false}
+            };
+            static const mcu_sleep_cfg_t sleep_cfg = {
+                .mode = MCU_SLEEP_MODE_WAIT,
+                .debounce = 0,
+                .num_wakeups = 1,
+                .wakeups = wakeups
+            };
+            mcu_sleep(&sleep_cfg);
+
+            // wake up: re-enable peripherals
+            pio_config_set(RADIO_OFF_PIO, PIO_OUTPUT_HIGH);
+            pio_config_set(IMU_OFF, PIO_OUTPUT_HIGH);
+            nrf = hat_radio_init();
+            imu_init();
+        }
+
+        // TX PWM values over radio, send zero if bumper hit active
         if (transmit_pwm_ticks++ >= TRANSMIT_PWM_TICKS)
         {
             int left_pwm, right_pwm;
-            get_pwm(&left_pwm, &right_pwm);
-            // printf("Left = %d    Right = %d\n", left_pwm, right_pwm);
+            if (bumper_hit_is_active())
+            {
+                left_pwm = 0;
+                right_pwm = 0;
+            }
+            else
+            {
+                get_pwm(&left_pwm, &right_pwm);
+            }
             transmit_pwm_ticks = 0;
 
             if (! hat_radio_pwm_send(nrf, left_pwm, right_pwm))
