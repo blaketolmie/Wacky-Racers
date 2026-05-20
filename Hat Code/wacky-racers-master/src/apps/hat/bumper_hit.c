@@ -6,10 +6,14 @@
 #include "ledbuffer.h"
 
 // sad trombone — Bb4, A4, Ab4, Eb4 (each note repeated for duration)
-static const uint16_t jingle[] = {466, 466, 440, 440, 415, 415, 311, 311, 311, 311};
+static const uint16_t jingle[] = {587, 587, 587, 587, 554, 554, 554, 554, 523, 523, 523, 523, 494, 494, 494, 494 ,494, 494, 494, 494};
 #define NUM_NOTES (sizeof(jingle) / sizeof(jingle[0]))
-#define NOTE_TICKS   15     // ticks per note step
-#define BUMPER_DURATION_TICKS (NUM_NOTES * NOTE_TICKS)
+
+#define BUMPER_DURATION_S 5
+#define BUMPER_DURATION_TICKS (PACER_RATE * BUMPER_DURATION_S)
+#define NOTE_TICKS (BUMPER_DURATION_TICKS / NUM_NOTES)
+
+
 
 static int ticks = 0;
 static bool active = false;
@@ -41,9 +45,18 @@ void bumper_hit_update(ledbuffer_t *leds)
         return;
 
     // step through jingle notes
-    int note_index = (ticks / NOTE_TICKS) % NUM_NOTES;
-    pwm_frequency_set(buzzer_pwm, jingle[note_index]);
-    pwm_duty_ppt_set(buzzer_pwm, 500);
+
+    if (ticks % NOTE_TICKS == 0)
+
+    {
+    int note_index = (ticks / NOTE_TICKS);
+    if (note_index >= NUM_NOTES)
+    note_index = NUM_NOTES - 1;
+    pwm_stop(buzzer_pwm);
+    buzzer_pwm = pwm_init(&(pwm_cfg_t){.pio = BUZZER_PIO, .frequency = jingle[note_index], .duty_ppt = 500});
+    pwm_start(buzzer_pwm);
+
+    }
 
     // flash all LEDs red, blink every 10 ticks
     ledbuffer_clear(leds);
