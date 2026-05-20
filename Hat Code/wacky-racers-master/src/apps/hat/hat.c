@@ -26,9 +26,9 @@ static void print_startup(void)
 // task frequencies (Hz)
 #define CHANNEL_CHECK_FREQUENCY 1
 #define BLINKY_FREQUENCY 2
-#define TRANSMIT_PWM_FREQUENCY 5
+#define TRANSMIT_PWM_FREQUENCY 20
 #define LED_STRIP_FREQUENCY 50
-#define LOW_VOLTAGE_FREQUENCY 1
+#define LOW_VOLTAGE_FREQUENCY 3
 
 // task ticks 
 #define CHANNEL_CHECK_TICKS (PACER_RATE/CHANNEL_CHECK_FREQUENCY)
@@ -50,14 +50,19 @@ int main(void)
     int led_strip_ticks = 0;
     int low_voltage_ticks = 0;
 
+    // Variables
     nrf24_t *nrf;
-
+    static int led_pos = 0;
+    static int led_pos2 = NUM_LEDS / 2; //start the second led on the other side
+    char buffer[RADIO_PAYLOAD_SIZE + 1];
+    int channel = 84;
     
 
 
     // Initialisation
-    pio_config_set(LED_STATUS_PIO, PIO_OUTPUT_LOW);
+    pio_config_set(LED_STATUS_PIO, PIO_OUTPUT_HIGH);
     pio_config_set(LED_ERROR_PIO, PIO_OUTPUT_HIGH);
+    pio_config_set(LED_GREEN_PIO, PIO_OUTPUT_HIGH);
     pio_config_set(BUTTON_1_PIO, PIO_PULLUP);
     pio_config_set(BUTTON_SLEEP_PIO, PIO_PULLUP);
     usb_serial_stdio_init();
@@ -70,21 +75,17 @@ int main(void)
     ledbuffer_t *leds = ledbuffer_init (LEDTAPE_PIO, NUM_LEDS);
     init_low_voltage();
 
-    static int led_pos = 0;
-    static int led_pos2 = NUM_LEDS / 2; //start the second led on the other side
-
     print_startup();
-
-    char buffer[RADIO_PAYLOAD_SIZE + 1];
 
     while (1)
     {
         pacer_wait();
         
         // Check whether channel has been changed using dip switch
-        if (channel_check_ticks++ >= CHANNEL_CHECK_TICKS)
+        if (channel_check_ticks++ >= CHANNEL_CHECK_TICKS && channel != radio_channel_get())
         {
-            nrf24_set_channel(nrf, radio_channel_get());
+            channel = radio_channel_get();
+            nrf24_set_channel(nrf, channel);
             channel_check_ticks = 0;
         }
 
@@ -92,6 +93,8 @@ int main(void)
         if (blinky_ticks++ >= BLINKY_TICKS)
         {
             pio_output_toggle(LED_STATUS_PIO);
+            printf("SLEEP BTN: %d\r\n", pio_input_get(BUTTON_SLEEP_PIO));
+            fflush(stdout);  
             blinky_ticks = 0;
         }
 
@@ -106,11 +109,17 @@ int main(void)
 
         // button 1 triggers bumper hit for testing
         if (!pio_input_get(BUTTON_1_PIO) && !bumper_hit_is_active())
+        {
             bumper_hit_start();
+        }
 
         // sleep button: shut everything down and wait for wakeup
         if (!pio_input_get(BUTTON_SLEEP_PIO))
-        {
+        {   
+            printf("sleep pressed\r\n");
+            fflush(stdout);
+            pio_config_set(LED_GREEN_PIO, PIO_OUTPUT_HIGH);
+
             // send zero PWM so the car stops
             hat_radio_pwm_send(nrf, 0, 0);
 
@@ -135,6 +144,7 @@ int main(void)
             // wake up: re-enable peripherals
             pio_config_set(RADIO_OFF_PIO, PIO_OUTPUT_HIGH);
             pio_config_set(IMU_OFF, PIO_OUTPUT_HIGH);
+            pio_config_set(LED_GREEN_PIO, PIO_OUTPUT_LOW);
             nrf = hat_radio_init();
             imu_init();
         }
@@ -152,9 +162,8 @@ int main(void)
             {
                 get_pwm(&left_pwm, &right_pwm);
             }
-            transmit_pwm_ticks = 0;
 
-            if (! hat_radio_pwm_send(nrf, left_pwm, right_pwm))
+            if (!hat_radio_pwm_send(nrf, left_pwm, right_pwm))
             {
                 pio_output_set(LED_ERROR_PIO, LED_ACTIVE);
                 printf("TX failed: %d %d\r\n", left_pwm, right_pwm);
@@ -164,7 +173,8 @@ int main(void)
                 pio_output_set(LED_ERROR_PIO, !LED_ACTIVE);
                 printf("TX pwm: %d %d\r\n", left_pwm, right_pwm);
             }
-            fflush(stdout);
+            fflush(stdout);            
+            transmit_pwm_ticks = 0;
         }
 
         // bumper hit takes over the LED strip while active
@@ -191,7 +201,6 @@ int main(void)
         }
 
 
-
         // Low Voltage
         if (low_voltage_ticks++ >= LOW_VOLTAGE_TICKS)
         {
@@ -205,7 +214,6 @@ int main(void)
             }
             low_voltage_ticks = 0;
         }
-
     }
 
     return 0;

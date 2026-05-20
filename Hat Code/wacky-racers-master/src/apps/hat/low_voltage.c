@@ -41,8 +41,9 @@ void low_power(bool STATE)
 {
     if (STATE == true)
     {
-        pio_output_set(LED_RED_PIO, LED_ACTIVE);
+        pio_output_toggle(LED_RED_PIO);
         // printf("LOW_POWER");
+
     }
     if (STATE == false)
     {
