@@ -1,0 +1,47 @@
+\chapter{Battery operation}
+\label{battery-operation}
+
+At this stage you should have an LED blinking when the MCU is powered
+from the ST-link.  The ST-Link provides 3.3\,V to power the MCU but
+eventually you need to power your board from a battery using a
+buck-converter to produce 5\,V that is reduced to 3.3\,V by a linear
+regulator.
+
+
+\section{Powering from power supply}
+
+\begin{itemize}
+\item Disconnect the ST-Link.
+
+\item Twist the wires for the battery connector to reduce their
+  inductance.
+
+\item Configure a bench-top power supply to provide 7\,V with a
+  current limit of 100\,mA.
+
+\item Check the current limit by turning on the power supply with the
+  output shorted.  The voltage should drop to 0\,V and the current
+  should be 100\,mA.
+
+\item Turn off the power supply and connect it to the battery
+  connector wires.
+
+\item Turn on the power supply.  If the current limits, turn the power
+  supply of immediately and look for shorts.  This is when those
+  0\,ohm isolating resistors come in handy.
+
+\item If your LED does not flash, check the 3.3\,V voltage to the MCU.
+
+\item Check the switching noise on the output of the buck-converter
+  using an oscilloscope.  You will need to zoom in on the trace to
+  50\,mV per division.  If you have more than 50\,mV of switching
+  noise, your may have problems with your radio reception.  You may
+  have a poor layout or need more capacitance.
+
+\end{itemize}
+
+
+\section{Powering from batteries}
+
+About a week before the race you will be provided with batteries to
+use instead of the power supply.
