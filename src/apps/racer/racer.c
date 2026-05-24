@@ -200,6 +200,8 @@ static void link_listen_on_channel(nrf24_t *nrf, uint8_t channel,
     {
         nrf24_set_channel(nrf, channel);
         *current_channel = channel;
+        printf("Radio channel: %u\r\n", channel);
+        fflush(stdout);
     }
 
     nrf24_listen(nrf);

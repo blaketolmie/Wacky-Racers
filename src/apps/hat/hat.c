@@ -40,6 +40,8 @@ static const uint8_t link_hop_table[] = {
     58, 30, 66, 42, 50
 };
 
+static uint8_t link_current_channel = 0xffu;
+
 typedef struct __attribute__((packed))
 {
     uint8_t version;
@@ -63,6 +65,17 @@ static uint8_t link_channel_for_counter(uint32_t counter)
     hop_index = (counter / LINK_PACKETS_PER_HOP) % hop_count;
 
     return link_hop_table[hop_index];
+}
+
+static void link_set_channel(nrf24_t *nrf, uint8_t channel)
+{
+    if (link_current_channel != channel)
+    {
+        nrf24_set_channel(nrf, channel);
+        link_current_channel = channel;
+        printf("Radio channel: %u\r\n", channel);
+        fflush(stdout);
+    }
 }
 
 static uint16_t link_make_check(const link_control_packet_t *packet)
@@ -120,7 +133,7 @@ static uint8_t link_control_send(nrf24_t *nrf, int left_pwm,
     if (! link_check_packet(&packet))
         return 0;
 
-    nrf24_set_channel(nrf, link_channel_for_counter(counter));
+    link_set_channel(nrf, link_channel_for_counter(counter));
 
     return nrf24_write(nrf, &packet, sizeof(packet));
 }
@@ -179,7 +192,8 @@ int main(void)
     nrf = hat_radio_init();
     if (! nrf)
         panic(LED_ERROR_PIO, 2);
-    nrf24_set_channel(nrf, link_channel_for_counter(tx_counter));
+    link_current_channel = 0xffu;
+    link_set_channel(nrf, link_channel_for_counter(tx_counter));
     imu_init();
     pacer_init(PACER_RATE);
     ledbuffer_t *leds = ledbuffer_init (LEDTAPE_PIO, NUM_LEDS);
@@ -249,7 +263,8 @@ int main(void)
             pio_config_set(IMU_OFF, PIO_OUTPUT_HIGH);
             pio_config_set(LED_GREEN_PIO, PIO_OUTPUT_LOW);
             nrf = hat_radio_init();
-            nrf24_set_channel(nrf, link_channel_for_counter(tx_counter));
+            link_current_channel = 0xffu;
+            link_set_channel(nrf, link_channel_for_counter(tx_counter));
             imu_init();
         }
 
@@ -281,7 +296,7 @@ int main(void)
             /* Increment every scheduled transmit so the hat can hop away from
                a bad channel even when the send or ACK fails. */
             tx_counter++;
-            nrf24_set_channel(nrf, link_channel_for_counter(tx_counter));
+            link_set_channel(nrf, link_channel_for_counter(tx_counter));
             fflush(stdout);            
             transmit_pwm_ticks = 0;
         }
