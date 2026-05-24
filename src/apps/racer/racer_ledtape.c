@@ -137,6 +137,8 @@ static void ledtape_standard_step(racer_ledtape_t *ledtape)
         {
             ledtape->standard_direction = 0;
             ledtape->standard_colour++;
+            if (LED_STRIP_NUMBER > 1)
+                ledtape->standard_pos--;
         }
         else
         {
@@ -149,6 +151,8 @@ static void ledtape_standard_step(racer_ledtape_t *ledtape)
         {
             ledtape->standard_direction = 1;
             ledtape->standard_colour++;
+            if (LED_STRIP_NUMBER > 1)
+                ledtape->standard_pos++;
         }
         else
         {
