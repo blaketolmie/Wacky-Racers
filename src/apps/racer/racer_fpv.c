@@ -1,3 +1,10 @@
+/*
+   FPV camera power control.
+
+   BUTTON_PIO toggles whether the FPV output is enabled.  The state is stored
+   in racer_fpv_t so sleep mode can temporarily turn power off, then restore
+   the user's chosen FPV setting after wakeup.
+*/
 #include <stdio.h>
 
 #include "racer_fpv.h"
@@ -13,6 +20,7 @@ static const button_cfg_t fpv_button_cfg =
 
 void racer_fpv_apply(racer_fpv_t *fpv)
 {
+    /* Apply the remembered state to the actual power-enable pin. */
     if (fpv->enabled)
         pio_output_high(FPV_ENABLE_PIO);
     else
@@ -21,10 +29,12 @@ void racer_fpv_apply(racer_fpv_t *fpv)
 
 int racer_fpv_init(racer_fpv_t *fpv)
 {
+    /* Create a debounced button object for the FPV toggle button. */
     fpv->button = button_init(&fpv_button_cfg);
     if (! fpv->button)
         return 1;
 
+    /* Start with FPV on unless the user turns it off. */
     fpv->enabled = true;
     racer_fpv_apply(fpv);
 
@@ -33,10 +43,12 @@ int racer_fpv_init(racer_fpv_t *fpv)
 
 void racer_fpv_update(racer_fpv_t *fpv)
 {
+    /* Poll once per main-loop tick so the button library can debounce it. */
     button_poll(fpv->button);
 
     if (button_pushed_p(fpv->button))
     {
+        /* Toggle on the press edge, not continuously while held. */
         fpv->enabled = !fpv->enabled;
         racer_fpv_apply(fpv);
 

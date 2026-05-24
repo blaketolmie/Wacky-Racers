@@ -1,3 +1,11 @@
+/*
+   Sleep handling for the racer.
+
+   This module uses SAM4S WAIT mode.  WAIT mode is lighter than fully turning
+   the MCU off: the CPU stops to save power, but SRAM and program variables
+   stay alive.  When the sleep button is pressed again, the program continues
+   from where it went to sleep.
+*/
 #include <stdio.h>
 
 /* Public sleep module interface used by the main racer test app. */

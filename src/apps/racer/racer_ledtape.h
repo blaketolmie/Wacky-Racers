@@ -9,10 +9,8 @@
 
 typedef enum
 {
+    RACER_LEDTAPE_MODE_STANDARD,
     RACER_LEDTAPE_MODE_RAINBOW,
-    RACER_LEDTAPE_MODE_GREEN,
-    RACER_LEDTAPE_MODE_RED,
-    RACER_LEDTAPE_MODE_BLUE,
     RACER_LEDTAPE_MODE_BLOCKS,
     RACER_LEDTAPE_MODE_OFF,
     RACER_LEDTAPE_MODE_NUM
@@ -24,6 +22,10 @@ typedef struct
     button_t pattern_button;
     bool enabled;
     racer_ledtape_mode_t mode;
+    uint8_t standard_pos;
+    uint8_t standard_direction;
+    uint8_t standard_colour;
+    uint8_t standard_ticks;
     uint8_t rainbow_offset;
     uint8_t block_filled;
     uint8_t block_pos;

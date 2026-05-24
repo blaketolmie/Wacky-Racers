@@ -1,3 +1,11 @@
+/*
+   Bumper handling for the racer.
+
+   A bumper press does three things:
+       1. tells main() to stop the motors and send STOP to the hat,
+       2. disables the H-bridge for a short safety window,
+       3. exposes an "active" state so the LED tape can flash red.
+*/
 #include <stdio.h>
 
 #include "racer_bumper.h"
@@ -10,11 +18,13 @@
 
 static const button_cfg_t bumper_button_cfg =
 {
+    /* The button library debounces the physical bumper switch. */
     .pio = BUMPER_PIO
 };
 
 int racer_bumper_init(racer_bumper_t *bumper)
 {
+    /* No bumper event is active at startup. */
     bumper->hbridge_off_ticks = 0;
     bumper->button = button_init(&bumper_button_cfg);
     if (! bumper->button)
@@ -25,6 +35,7 @@ int racer_bumper_init(racer_bumper_t *bumper)
 
 void racer_bumper_reset(racer_bumper_t *bumper)
 {
+    /* Used after sleep so the car wakes with the H-bridge enabled again. */
     bumper->hbridge_off_ticks = 0;
     pio_output_high(HBRIDGE_ENABLE_PIO);
 }
@@ -37,6 +48,7 @@ bool racer_bumper_update(racer_bumper_t *bumper)
 
     if (button_pushed_p(bumper->button))
     {
+        /* First tick of a new bumper press. */
         pushed = true;
         bumper->hbridge_off_ticks = HBRIDGE_OFF_TICKS;
         pio_output_low(HBRIDGE_ENABLE_PIO);
@@ -46,6 +58,7 @@ bool racer_bumper_update(racer_bumper_t *bumper)
 
     if (bumper->hbridge_off_ticks > 0)
     {
+        /* Count down the safety window one main-loop tick at a time. */
         bumper->hbridge_off_ticks--;
         if (bumper->hbridge_off_ticks == 0)
         {

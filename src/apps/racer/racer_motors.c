@@ -1,3 +1,10 @@
+/*
+   Motor driver for the racer board.
+
+   The main program gives this module left and right commands from -100 to
+   +100.  This module clamps those values, sets the direction pins, and updates
+   the PWM duty cycle that drives the H-bridge inputs.
+*/
 #include <stdio.h>
 
 #include "racer_motors.h"
@@ -14,6 +21,7 @@
 #define DUTY_MIN 0
 #define DUTY_MAX 100
 
+/* PWM setup for the left motor output pin.  The duty starts at 0 percent. */
 static const pwm_cfg_t left_pwm_cfg =
 {
     .pio = LEFT_PWM_PIO,
@@ -24,6 +32,7 @@ static const pwm_cfg_t left_pwm_cfg =
     .stop_state = PIO_OUTPUT_LOW
 };
 
+/* PWM setup for the right motor output pin.  It mirrors the left setup. */
 static const pwm_cfg_t right_pwm_cfg =
 {
     .pio = RIGHT_PWM_PIO,
@@ -36,6 +45,7 @@ static const pwm_cfg_t right_pwm_cfg =
 
 static int clamp(int value, int min, int max)
 {
+    /* Keep radio commands inside the safe motor command range. */
     if (value > max)
         return max;
 
@@ -55,6 +65,7 @@ static int abs_int(int value)
 
 int racer_motors_init(racer_motors_t *motors)
 {
+    /* Configure status LEDs/outputs and make sure the H-bridge is enabled. */
     pio_config_set(STAT0_PIO, PIO_OUTPUT_HIGH);
     pio_config_set(STAT1_PIO, PIO_OUTPUT_HIGH);
     pio_config_set(STAT2_PIO, PIO_OUTPUT_HIGH);
@@ -66,6 +77,7 @@ int racer_motors_init(racer_motors_t *motors)
     pio_config_set(LEFT_DIR_PIO, PIO_OUTPUT_LOW);
     pio_config_set(RIGHT_DIR_PIO, PIO_OUTPUT_LOW);
 
+    /* Create the two PWM channels.  A null return means setup failed. */
     motors->left_pwm = pwm_init(&left_pwm_cfg);
     if (!motors->left_pwm)
         return 1;
@@ -77,6 +89,7 @@ int racer_motors_init(racer_motors_t *motors)
     pwm_channels_start(pwm_channel_mask(motors->left_pwm)
                        | pwm_channel_mask(motors->right_pwm));
 
+    /* Start from a known safe state: both motors stopped. */
     racer_motors_stop(motors);
 
     return 0;
@@ -84,7 +97,7 @@ int racer_motors_init(racer_motors_t *motors)
 
 void racer_motors_stop(racer_motors_t *motors)
 {
-    /* Stop logic from working code */
+    /* Turn on the stopped status indication and remove PWM drive. */
     pio_output_high(STAT3_PIO);
     pio_output_low(STAT0_PIO);
 
@@ -104,9 +117,14 @@ void racer_motors_set(racer_motors_t *motors,
     left_command = clamp(left_command, -100, 100);
     right_command = clamp(right_command, -100, 100);
 
+    /*
+       The sign chooses direction.  The absolute value chooses speed.
+       For example, -40 means reverse at about 40 percent.
+    */
     left_duty = abs_int(left_command);
     right_duty = abs_int(right_command);
 
+    /* A zero/zero command is the same as an explicit stop. */
     if ((left_command == 0) && (right_command == 0))
     {
         racer_motors_stop(motors);
@@ -125,6 +143,9 @@ void racer_motors_set(racer_motors_t *motors,
        Reverse:
            LEFT_DIR  HIGH
            RIGHT_DIR HIGH
+
+       The left and right H-bridge inputs are wired differently, so one side
+       uses 100 - duty in forward and the other side uses it in reverse.
     */
 
     if (left_command >= 0) {

@@ -1,3 +1,10 @@
+/*
+   Legacy DIP-switch radio channel helper.
+
+   The current anti-replay radio link uses counter-based hopping instead of
+   this fixed-channel value, but this helper is kept for older tests and for
+   anyone who wants to read the DIP switches directly.
+*/
 #include "racer_radio_channel.h"
 #include "pio.h"
 #include "target.h"
@@ -11,6 +18,7 @@
 
 void racer_radio_channel_init(void)
 {
+    /* Pullups mean an open switch reads 1 and a closed/ON switch reads 0. */
     pio_config_set(DIP_SW_1_PIO, PIO_PULLUP);
     pio_config_set(DIP_SW_2_PIO, PIO_PULLUP);
     pio_config_set(DIP_SW_3_PIO, PIO_PULLUP);
@@ -21,6 +29,7 @@ uint8_t racer_radio_channel_get(void)
 {
     uint8_t channel_offset = 0;
 
+    /* Build a 4-bit number from the DIP switches. */
     if (! pio_input_get(DIP_SW_1_PIO))
         channel_offset |= 1;
     if (! pio_input_get(DIP_SW_2_PIO))

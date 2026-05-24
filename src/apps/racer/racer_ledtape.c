@@ -1,3 +1,10 @@
+/*
+   LED strip patterns for the racer.
+
+   The LED tape has normal user-selectable modes, plus a temporary bumper
+   override.  When the bumper is active, the strip ignores the normal mode and
+   flashes red to match the hat's bumper pattern.
+*/
 #include <stdio.h>
 
 #include "racer_ledtape.h"
@@ -5,10 +12,13 @@
 
 #define LEDTAPE_PATTERN_BUTTON_PIO BUTTON_PIO2
 #define LEDTAPE_WRITE_TICKS 4
+#define STANDARD_STEP_TICKS 4
+#define STANDARD_COLOUR_NUM 6
 #define BLOCK_STEP_TICKS 6
 #define CELEBRATION_TICKS 14
 #define BUMPER_FLASH_TICKS 10
 
+/* BUTTON_PIO2 cycles through the LED strip modes. */
 static const button_cfg_t ledtape_button_cfg =
 {
     .pio = LEDTAPE_PATTERN_BUTTON_PIO
@@ -16,10 +26,8 @@ static const button_cfg_t ledtape_button_cfg =
 
 static const char *ledtape_mode_names[] =
 {
+    "standard",
     "rainbow",
-    "green",
-    "red",
-    "blue",
     "blocks",
     "off"
 };
@@ -27,6 +35,10 @@ static const char *ledtape_mode_names[] =
 static void rainbow_colour(uint8_t wheel_pos,
                            uint8_t *red, uint8_t *green, uint8_t *blue)
 {
+    /*
+       Convert a 0..255 wheel position into an RGB colour.  Moving the wheel
+       position over time makes the rainbow appear to flow along the strip.
+    */
     if (wheel_pos < 85)
     {
         *red = 255 - wheel_pos * 3;
@@ -50,14 +62,101 @@ static void rainbow_colour(uint8_t wheel_pos,
     *blue = 255 - wheel_pos * 3;
 }
 
-static void ledtape_fill_solid(ledbuffer_t *leds,
-                               uint8_t red, uint8_t green, uint8_t blue)
+static void standard_colour(uint8_t colour,
+                            uint8_t *red, uint8_t *green, uint8_t *blue)
 {
-    int i;
+    /*
+       The standard scanner changes to the next colour each time it bounces
+       off an end of the LED strip.
+    */
+    switch (colour % STANDARD_COLOUR_NUM)
+    {
+    case 0:
+        *red = 255;
+        *green = 0;
+        *blue = 0;
+        break;
 
-    ledbuffer_clear(leds);
-    for (i = 0; i < LED_STRIP_NUMBER; i++)
-        ledbuffer_set(leds, i, red, green, blue);
+    case 1:
+        *red = 255;
+        *green = 80;
+        *blue = 0;
+        break;
+
+    case 2:
+        *red = 0;
+        *green = 255;
+        *blue = 0;
+        break;
+
+    case 3:
+        *red = 0;
+        *green = 120;
+        *blue = 255;
+        break;
+
+    case 4:
+        *red = 0;
+        *green = 0;
+        *blue = 255;
+        break;
+
+    default:
+        *red = 180;
+        *green = 0;
+        *blue = 255;
+        break;
+    }
+}
+
+static void ledtape_standard_reset(racer_ledtape_t *ledtape)
+{
+    /* Start at one end and move toward the other end. */
+    ledtape->standard_pos = 0;
+    ledtape->standard_direction = 1;
+    ledtape->standard_colour = 0;
+    ledtape->standard_ticks = 0;
+}
+
+static void ledtape_fill_standard(racer_ledtape_t *ledtape)
+{
+    uint8_t red;
+    uint8_t green;
+    uint8_t blue;
+
+    ledbuffer_clear(ledtape->leds);
+    standard_colour(ledtape->standard_colour, &red, &green, &blue);
+    ledbuffer_set(ledtape->leds, ledtape->standard_pos, red, green, blue);
+}
+
+static void ledtape_standard_step(racer_ledtape_t *ledtape)
+{
+    if (ledtape->standard_direction)
+    {
+        if (ledtape->standard_pos >= LED_STRIP_NUMBER - 1)
+        {
+            ledtape->standard_direction = 0;
+            ledtape->standard_colour++;
+        }
+        else
+        {
+            ledtape->standard_pos++;
+        }
+    }
+    else
+    {
+        if (ledtape->standard_pos == 0)
+        {
+            ledtape->standard_direction = 1;
+            ledtape->standard_colour++;
+        }
+        else
+        {
+            ledtape->standard_pos--;
+        }
+    }
+
+    ledtape_fill_standard(ledtape);
 }
 
 static void ledtape_fill_bumper(racer_ledtape_t *ledtape)
@@ -97,6 +196,7 @@ static void ledtape_fill_rainbow(racer_ledtape_t *ledtape)
 static void block_colour(uint8_t colour,
                          uint8_t *red, uint8_t *green, uint8_t *blue)
 {
+    /* Pick a low-brightness colour for each falling block. */
     switch (colour % 5)
     {
     case 0:
@@ -133,6 +233,7 @@ static void block_colour(uint8_t colour,
 
 static void ledtape_blocks_reset(racer_ledtape_t *ledtape)
 {
+    /* Put the block animation back at the beginning. */
     ledtape->block_filled = 0;
     ledtape->block_pos = 0;
     ledtape->block_colour = 0;
@@ -148,6 +249,7 @@ static void ledtape_fill_blocks(racer_ledtape_t *ledtape)
 
     if (ledtape->celebration_ticks > 0)
     {
+        /* When the strip fills up, briefly show a rainbow celebration. */
         ledtape_fill_rainbow(ledtape);
         return;
     }
@@ -166,6 +268,7 @@ static void ledtape_fill_blocks(racer_ledtape_t *ledtape)
 
     if (ledtape->block_filled < LED_STRIP_NUMBER)
     {
+        /* Draw the currently falling block. */
         uint8_t red;
         uint8_t green;
         uint8_t blue;
@@ -179,6 +282,7 @@ static void ledtape_blocks_step(racer_ledtape_t *ledtape)
 {
     uint8_t target_pos;
 
+    /* Advance the blocks animation by one step. */
     if (ledtape->celebration_ticks > 0)
     {
         ledtape->celebration_ticks--;
@@ -221,6 +325,7 @@ static void ledtape_blocks_step(racer_ledtape_t *ledtape)
 
 static void ledtape_show_mode(racer_ledtape_t *ledtape)
 {
+    /* Draw the current mode into the LED buffer.  The caller writes it out. */
     if (! ledtape->enabled)
     {
         ledbuffer_clear(ledtape->leds);
@@ -229,17 +334,8 @@ static void ledtape_show_mode(racer_ledtape_t *ledtape)
 
     switch (ledtape->mode)
     {
-    case RACER_LEDTAPE_MODE_GREEN:
-        /* Soft green is the normal awake colour. */
-        ledtape_fill_solid(ledtape->leds, 0, 40, 0);
-        break;
-
-    case RACER_LEDTAPE_MODE_RED:
-        ledtape_fill_solid(ledtape->leds, 40, 0, 0);
-        break;
-
-    case RACER_LEDTAPE_MODE_BLUE:
-        ledtape_fill_solid(ledtape->leds, 0, 0, 40);
+    case RACER_LEDTAPE_MODE_STANDARD:
+        ledtape_fill_standard(ledtape);
         break;
 
     case RACER_LEDTAPE_MODE_RAINBOW:
@@ -259,6 +355,7 @@ static void ledtape_show_mode(racer_ledtape_t *ledtape)
 
 int racer_ledtape_init(racer_ledtape_t *ledtape)
 {
+    /* Create the LED buffer and the mode button. */
     ledtape->leds = ledbuffer_init(LEDTAPE_PIO, LED_STRIP_NUMBER);
     if (! ledtape->leds)
         return 1;
@@ -268,7 +365,9 @@ int racer_ledtape_init(racer_ledtape_t *ledtape)
         return 2;
 
     ledtape->enabled = true;
-    ledtape->mode = RACER_LEDTAPE_MODE_RAINBOW;
+    /* Standard mode is the default: one LED slowly scans back and forth. */
+    ledtape->mode = RACER_LEDTAPE_MODE_STANDARD;
+    ledtape_standard_reset(ledtape);
     ledtape->rainbow_offset = 0;
     ledtape_blocks_reset(ledtape);
     ledtape->write_ticks = 0;
@@ -283,6 +382,7 @@ int racer_ledtape_init(racer_ledtape_t *ledtape)
 
 void racer_ledtape_set(racer_ledtape_t *ledtape, bool enabled)
 {
+    /* Used by sleep mode to turn the strip off and back on. */
     ledtape->enabled = enabled;
 
     ledtape_show_mode(ledtape);
@@ -291,6 +391,10 @@ void racer_ledtape_set(racer_ledtape_t *ledtape, bool enabled)
 
 void racer_ledtape_bumper_set(racer_ledtape_t *ledtape, bool active)
 {
+    /*
+       This does not know about the bumper button itself.  The main program
+       tells us whether the bumper stop window is active.
+    */
     if (active && ! ledtape->bumper_active)
         ledtape->bumper_ticks = 0;
 
@@ -307,6 +411,7 @@ void racer_ledtape_bumper_set(racer_ledtape_t *ledtape, bool active)
 
 void racer_ledtape_update(racer_ledtape_t *ledtape)
 {
+    /* Bumper warning has priority over every normal pattern. */
     if (ledtape->bumper_active)
     {
         ledtape_fill_bumper(ledtape);
@@ -319,11 +424,14 @@ void racer_ledtape_update(racer_ledtape_t *ledtape)
 
     if (button_pushed_p(ledtape->pattern_button))
     {
+        /* Move to the next mode each time BUTTON_PIO2 is pressed. */
         ledtape->mode++;
         if (ledtape->mode >= RACER_LEDTAPE_MODE_NUM)
-            ledtape->mode = RACER_LEDTAPE_MODE_RAINBOW;
+            ledtape->mode = RACER_LEDTAPE_MODE_STANDARD;
 
-        if (ledtape->mode == RACER_LEDTAPE_MODE_RAINBOW)
+        if (ledtape->mode == RACER_LEDTAPE_MODE_STANDARD)
+            ledtape_standard_reset(ledtape);
+        else if (ledtape->mode == RACER_LEDTAPE_MODE_RAINBOW)
             ledtape->rainbow_offset = 0;
         else if (ledtape->mode == RACER_LEDTAPE_MODE_BLOCKS)
             ledtape_blocks_reset(ledtape);
@@ -341,9 +449,19 @@ void racer_ledtape_update(racer_ledtape_t *ledtape)
     ledtape->write_ticks++;
     if (ledtape->write_ticks >= LEDTAPE_WRITE_TICKS)
     {
+        /* Slow down animated modes so they are visible and not too busy. */
         ledtape->write_ticks = 0;
 
-        if (ledtape->mode == RACER_LEDTAPE_MODE_RAINBOW)
+        if (ledtape->mode == RACER_LEDTAPE_MODE_STANDARD)
+        {
+            ledtape->standard_ticks++;
+            if (ledtape->standard_ticks >= STANDARD_STEP_TICKS)
+            {
+                ledtape->standard_ticks = 0;
+                ledtape_standard_step(ledtape);
+            }
+        }
+        else if (ledtape->mode == RACER_LEDTAPE_MODE_RAINBOW)
         {
             ledtape->rainbow_offset += 4;
             ledtape_fill_rainbow(ledtape);
