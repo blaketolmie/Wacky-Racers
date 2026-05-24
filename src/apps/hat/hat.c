@@ -33,11 +33,14 @@
 #define LINK_RESYNC_GRACE_MS     120u
 #define LINK_SECRET              0x5A3C9E27u
 
+/*
+   Channels 1-10 are left unused.  These channels are spaced 4 MHz apart,
+   then ordered so each hop moves well away from the previous RF channel.
+*/
 static const uint8_t link_hop_table[] = {
-    2, 26, 62, 14, 74,
-    38, 6, 54, 18, 70,
-    34, 10, 46, 78, 22,
-    58, 30, 66, 42, 50
+    11, 43, 75, 27, 59, 15,
+    47, 79, 31, 63, 19, 51,
+    23, 55, 35, 67, 39, 71
 };
 
 static uint8_t link_current_channel = 0xffu;
