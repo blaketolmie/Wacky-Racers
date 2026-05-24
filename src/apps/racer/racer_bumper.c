@@ -57,3 +57,8 @@ bool racer_bumper_update(racer_bumper_t *bumper)
 
     return pushed;
 }
+
+bool racer_bumper_is_active(racer_bumper_t *bumper)
+{
+    return bumper->hbridge_off_ticks > 0;
+}

@@ -7,6 +7,7 @@
 #define LEDTAPE_WRITE_TICKS 4
 #define BLOCK_STEP_TICKS 6
 #define CELEBRATION_TICKS 14
+#define BUMPER_FLASH_TICKS 10
 
 static const button_cfg_t ledtape_button_cfg =
 {
@@ -15,10 +16,10 @@ static const button_cfg_t ledtape_button_cfg =
 
 static const char *ledtape_mode_names[] =
 {
+    "rainbow",
     "green",
     "red",
     "blue",
-    "rainbow",
     "blocks",
     "off"
 };
@@ -57,6 +58,22 @@ static void ledtape_fill_solid(ledbuffer_t *leds,
     ledbuffer_clear(leds);
     for (i = 0; i < LED_STRIP_NUMBER; i++)
         ledbuffer_set(leds, i, red, green, blue);
+}
+
+static void ledtape_fill_bumper(racer_ledtape_t *ledtape)
+{
+    int i;
+
+    /*
+       Match the hat bumper pattern: all LEDs flash bright red, with a
+       10-tick on/off blink while the bumper stop window is active.
+    */
+    ledbuffer_clear(ledtape->leds);
+    if ((ledtape->bumper_ticks / BUMPER_FLASH_TICKS) % 2 == 0)
+    {
+        for (i = 0; i < LED_STRIP_NUMBER; i++)
+            ledbuffer_set(ledtape->leds, i, 255, 0, 0);
+    }
 }
 
 static void ledtape_fill_rainbow(racer_ledtape_t *ledtape)
@@ -251,10 +268,12 @@ int racer_ledtape_init(racer_ledtape_t *ledtape)
         return 2;
 
     ledtape->enabled = true;
-    ledtape->mode = RACER_LEDTAPE_MODE_GREEN;
+    ledtape->mode = RACER_LEDTAPE_MODE_RAINBOW;
     ledtape->rainbow_offset = 0;
     ledtape_blocks_reset(ledtape);
     ledtape->write_ticks = 0;
+    ledtape->bumper_ticks = 0;
+    ledtape->bumper_active = false;
 
     ledtape_show_mode(ledtape);
     ledbuffer_write(ledtape->leds);
@@ -270,15 +289,39 @@ void racer_ledtape_set(racer_ledtape_t *ledtape, bool enabled)
     ledbuffer_write(ledtape->leds);
 }
 
+void racer_ledtape_bumper_set(racer_ledtape_t *ledtape, bool active)
+{
+    if (active && ! ledtape->bumper_active)
+        ledtape->bumper_ticks = 0;
+
+    if (! active && ledtape->bumper_active)
+    {
+        ledtape->bumper_ticks = 0;
+        ledtape->write_ticks = 0;
+        ledtape_show_mode(ledtape);
+        ledbuffer_write(ledtape->leds);
+    }
+
+    ledtape->bumper_active = active;
+}
+
 void racer_ledtape_update(racer_ledtape_t *ledtape)
 {
+    if (ledtape->bumper_active)
+    {
+        ledtape_fill_bumper(ledtape);
+        ledbuffer_write(ledtape->leds);
+        ledtape->bumper_ticks++;
+        return;
+    }
+
     button_poll(ledtape->pattern_button);
 
     if (button_pushed_p(ledtape->pattern_button))
     {
         ledtape->mode++;
         if (ledtape->mode >= RACER_LEDTAPE_MODE_NUM)
-            ledtape->mode = RACER_LEDTAPE_MODE_GREEN;
+            ledtape->mode = RACER_LEDTAPE_MODE_RAINBOW;
 
         if (ledtape->mode == RACER_LEDTAPE_MODE_RAINBOW)
             ledtape->rainbow_offset = 0;

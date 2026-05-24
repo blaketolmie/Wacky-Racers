@@ -14,6 +14,7 @@ typedef struct
 
 int racer_bumper_init(racer_bumper_t *bumper);
 bool racer_bumper_update(racer_bumper_t *bumper);
+bool racer_bumper_is_active(racer_bumper_t *bumper);
 void racer_bumper_reset(racer_bumper_t *bumper);
 
 #endif

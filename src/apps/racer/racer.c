@@ -308,16 +308,20 @@ int main(void)
     while (1)
     {
         link_control_packet_t packet;
+        bool bumper_pushed;
 
         pacer_wait();
         now_ms += MAIN_LOOP_PERIOD_MS;
 
         racer_heartbeat_update();
         racer_low_voltage_update();
-        racer_ledtape_update(&ledtape);
         racer_fpv_update(&fpv);
 
-        if (racer_bumper_update(&bumper))
+        bumper_pushed = racer_bumper_update(&bumper);
+        racer_ledtape_bumper_set(&ledtape, racer_bumper_is_active(&bumper));
+        racer_ledtape_update(&ledtape);
+
+        if (bumper_pushed)
         {
             racer_motors_stop(&motors);
             radio_link_stop_send(nrf);
@@ -335,6 +339,7 @@ int main(void)
             racer_power_sleep_exit();
             racer_fpv_apply(&fpv);
             racer_bumper_reset(&bumper);
+            racer_ledtape_bumper_set(&ledtape, false);
             racer_ledtape_set(&ledtape, true);
             racer_sleep_finish(&sleep);
 
