@@ -52,7 +52,7 @@ void racer_fpv_update(racer_fpv_t *fpv)
         fpv->enabled = !fpv->enabled;
         racer_fpv_apply(fpv);
 
-        printf("FPV %s using BUTTON_PIO\r\n", fpv->enabled ? "ON" : "OFF");
+        /* printf("FPV %s using BUTTON_PIO\r\n", fpv->enabled ? "ON" : "OFF"); */
         fflush(stdout);
     }
 }

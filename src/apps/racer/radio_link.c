@@ -65,15 +65,19 @@ uint8_t radio_link_stop_send(nrf24_t *nrf)
     char buffer[RADIO_PAYLOAD_SIZE] = STOP_MESSAGE;
     uint8_t bytes;
 
-    printf("Button pushed: sending STOP to hat...\r\n");
+    /* printf("Button pushed: sending STOP to hat...\r\n"); */
     fflush(stdout);
 
     bytes = nrf24_write(nrf, buffer, RADIO_PAYLOAD_SIZE);
 
     if (! bytes)
-        printf("TX failed\r\n");
+    {
+        /* printf("TX failed\r\n"); */
+    }
     else
-        printf("TX: %s\r\n", buffer);
+    {
+        /* printf("TX: %s\r\n", buffer); */
+    }
 
     fflush(stdout);
 

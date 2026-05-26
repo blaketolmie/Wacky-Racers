@@ -63,7 +63,7 @@ static void link_set_channel(nrf24_t *nrf, uint8_t channel)
     {
         nrf24_set_channel(nrf, channel);
         link_current_channel = channel;
-        printf("Radio channel: %u\r\n", channel);
+        /* printf("Radio channel: %u\r\n", channel); */
         fflush(stdout);
     }
 }
@@ -131,12 +131,14 @@ static uint8_t link_control_send(nrf24_t *nrf, int left_pwm,
 
 static void print_startup(void)
 {
-    printf("\r\nWacky Hat radio PWM sender ready.\r\n");
-    printf("Sending checked control packets every %u ms\r\n", LINK_TX_PERIOD_MS);
+    /* printf("\r\nWacky Hat radio PWM sender ready.\r\n"); */
+    /* printf("Sending checked control packets every %u ms\r\n", LINK_TX_PERIOD_MS); */
+    /*
     printf("Radio hops every %u packets, about %u ms\r\n",
            LINK_PACKETS_PER_HOP,
            LINK_PACKETS_PER_HOP * LINK_TX_PERIOD_MS);
-    printf("LED_STATUS toggles after STOP is received\r\n");
+    */
+    /* printf("LED_STATUS toggles after STOP is received\r\n"); */
     fflush(stdout);
 }
 
@@ -195,7 +197,7 @@ int main(void)
         if (blinky_ticks++ >= BLINKY_TICKS)
         {
             pio_output_toggle(LED_STATUS_PIO);
-            printf("SLEEP BTN: %d\r\n", pio_input_get(BUTTON_SLEEP_PIO));
+            /* printf("SLEEP BTN: %d\r\n", pio_input_get(BUTTON_SLEEP_PIO)); */
             fflush(stdout);  
             blinky_ticks = 0;
         }
@@ -203,7 +205,7 @@ int main(void)
         // Radio RX - happens every tick
         if (hat_radio_read(nrf, buffer))
         {
-            printf("RX: %s\r\n", buffer);
+            /* printf("RX: %s\r\n", buffer); */
             if (hat_radio_stop_received(buffer))
                 bumper_hit_start();
             fflush(stdout);
@@ -218,7 +220,7 @@ int main(void)
         // sleep button: shut everything down and wait for wakeup
         if (!pio_input_get(BUTTON_SLEEP_PIO))
         {   
-            printf("sleep pressed\r\n");
+            /* printf("sleep pressed\r\n"); */
             fflush(stdout);
             pio_config_set(LED_GREEN_PIO, PIO_OUTPUT_HIGH);
 
@@ -272,12 +274,12 @@ int main(void)
             if (!link_control_send(nrf, left_pwm, right_pwm, tx_counter))
             {
                 pio_output_set(LED_ERROR_PIO, LED_ACTIVE);
-                printf("TX failed: %d %d\r\n", left_pwm, right_pwm);
+                /* printf("TX failed: %d %d\r\n", left_pwm, right_pwm); */
             }
             else
             {
                 pio_output_set(LED_ERROR_PIO, !LED_ACTIVE);
-                printf("TX pwm: %d %d\r\n", left_pwm, right_pwm);
+                /* printf("TX pwm: %d %d\r\n", left_pwm, right_pwm); */
             }
             /* Increment every scheduled transmit so the hat can hop away from
                a bad channel even when the send or ACK fails. */

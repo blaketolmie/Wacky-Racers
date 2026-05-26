@@ -443,7 +443,7 @@ void racer_ledtape_update(racer_ledtape_t *ledtape)
         ledtape_show_mode(ledtape);
         ledbuffer_write(ledtape->leds);
 
-        printf("LED tape mode: %s\r\n", ledtape_mode_names[ledtape->mode]);
+        /* printf("LED tape mode: %s\r\n", ledtape_mode_names[ledtape->mode]); */
         fflush(stdout);
     }
 

@@ -153,7 +153,7 @@ void racer_motors_set(racer_motors_t *motors,
     if ((left_command == 0) && (right_command == 0))
     {
         racer_motors_stop(motors);
-        printf("Stopped\r\n");
+        /* printf("Stopped\r\n"); */
         fflush(stdout);
         return;
     }
@@ -196,6 +196,6 @@ void racer_motors_set(racer_motors_t *motors,
     pwm_duty_set(motors->left_pwm, PWM_DUTY_DIVISOR(PWM_FREQ_HZ, left_duty));
     pwm_duty_set(motors->right_pwm, PWM_DUTY_DIVISOR(PWM_FREQ_HZ, right_duty));
 
-    printf("Left = %d, Right = %d\r\n", left_command, right_command);
+    /* printf("Left = %d, Right = %d\r\n", left_command, right_command); */
     fflush(stdout);
 }

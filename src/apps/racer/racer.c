@@ -190,7 +190,7 @@ static void link_listen_on_channel(nrf24_t *nrf, uint8_t channel,
     {
         nrf24_set_channel(nrf, channel);
         *current_channel = channel;
-        printf("Radio channel: %u\r\n", channel);
+        /* printf("Radio channel: %u\r\n", channel); */
         fflush(stdout);
     }
 
@@ -270,18 +270,22 @@ static bool link_poll(nrf24_t *nrf, link_control_packet_t *packet,
 
 static void print_startup(void)
 {
-    printf("\r\nWacky Racer radio PWM motor control ready.\r\n");
-    printf("RX input format: checked control packet\r\n");
-    printf("Duty range: -100 to 100\r\n");
-    printf("BUMPER_PIO sends STOP and disables the H-bridge for 5 seconds\r\n");
-    printf("SLEEP_PIO toggles MCU sleep on/off\r\n");
-    printf("BUTTON_PIO toggles FPV on/off\r\n");
-    printf("BUTTON_PIO2 cycles LED tape: standard, rainbow, blocks, off\r\n");
+    /* printf("\r\nWacky Racer radio PWM motor control ready.\r\n"); */
+    /* printf("RX input format: checked control packet\r\n"); */
+    /* printf("Duty range: -100 to 100\r\n"); */
+    /* printf("BUMPER_PIO sends STOP and disables the H-bridge for 5 seconds\r\n"); */
+    /* printf("SLEEP_PIO toggles MCU sleep on/off\r\n"); */
+    /* printf("BUTTON_PIO toggles FPV on/off\r\n"); */
+    /* printf("BUTTON_PIO2 cycles LED tape: standard, rainbow, blocks, off\r\n"); */
+    /*
     printf("Radio hops every %u packets, about %u ms\r\n",
            LINK_PACKETS_PER_HOP,
            LINK_PACKETS_PER_HOP * LINK_TX_PERIOD_MS);
+    */
+    /*
     printf("Failsafe stops motors after %u ms without a valid packet\r\n",
            LINK_FAILSAFE_MS);
+    */
     fflush(stdout);
 }
 
@@ -301,11 +305,13 @@ static void process_radio_command(racer_motors_t *motors,
         right_pwm = old_left_pwm;
     }
 
+    /*
     printf("RX counter %lu%s: %d %d\r\n",
            (unsigned long)packet->counter,
            controls_flipped ? " flipped" : "",
            left_pwm,
            right_pwm);
+    */
     racer_motors_set(motors, left_pwm, right_pwm);
 }
 
@@ -317,8 +323,10 @@ static void racer_restart_for_link_loss(racer_motors_t *motors)
        the MCU so the radio, counters, and scan state begin from a clean setup.
     */
     racer_motors_stop(motors);
+    /*
     printf("No valid radio packet for %u ms, restarting racer\r\n",
            RACER_LINK_RESTART_MS);
+    */
     fflush(stdout);
 
     mcu_reset();
@@ -381,7 +389,7 @@ int main(void)
     error = racer_imu_init();
     if (error)
     {
-        printf("Racer IMU disabled, init error %d\r\n", error);
+        /* printf("Racer IMU disabled, init error %d\r\n", error); */
         fflush(stdout);
     }
     else
@@ -393,7 +401,7 @@ int main(void)
     pacer_init(BUTTON_POLL_RATE);
 
     print_startup();
-    printf("Starting radio channel: %u\r\n", radio_channel);
+    /* printf("Starting radio channel: %u\r\n", radio_channel); */
     fflush(stdout);
 
     while (1)
@@ -445,7 +453,7 @@ int main(void)
             imu_enabled = error == 0;
             if (error)
             {
-                printf("Racer IMU disabled after wake, init error %d\r\n", error);
+                /* printf("Racer IMU disabled after wake, init error %d\r\n", error); */
                 fflush(stdout);
             }
             racer_fpv_apply(&fpv);
@@ -462,7 +470,7 @@ int main(void)
             if (! nrf)
                 panic(LED_ERROR_PIO, 8);
 
-            printf("Starting radio channel: %u\r\n", radio_channel);
+            /* printf("Starting radio channel: %u\r\n", radio_channel); */
             fflush(stdout);
             continue;
         }

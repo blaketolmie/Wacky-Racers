@@ -185,7 +185,7 @@ void racer_sleep_arm(racer_sleep_t *sleep)
     sleep->sleeping = true;
 
     /* Tell the serial terminal what the user needs to do next. */
-    printf("Sleep requested. Release SLEEP_PIO, then the racer will sleep.\r\n");
+    /* printf("Sleep requested. Release SLEEP_PIO, then the racer will sleep.\r\n"); */
     fflush(stdout);
 
     /* Wait for the first press to be released before power is turned off. */
@@ -199,7 +199,7 @@ void racer_sleep_arm(racer_sleep_t *sleep)
 */
 void racer_sleep_wait_for_wake(racer_sleep_t *sleep)
 {
-    printf("WAIT sleep ON using WKUP2. Press SLEEP_PIO again to wake.\r\n");
+    /* printf("WAIT sleep ON using WKUP2. Press SLEEP_PIO again to wake.\r\n"); */
     fflush(stdout);
 
     /* This function returns after the WKUP2 wake event. */
@@ -219,6 +219,6 @@ void racer_sleep_finish(racer_sleep_t *sleep)
     /* Avoid an unused-parameter warning without changing the API. */
     (void)sleep;
 
-    printf("WAIT sleep OFF by SLEEP_PIO/WKUP2.\r\n");
+    /* printf("WAIT sleep OFF by SLEEP_PIO/WKUP2.\r\n"); */
     fflush(stdout);
 }

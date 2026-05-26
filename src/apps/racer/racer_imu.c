@@ -70,8 +70,10 @@ int racer_imu_init(void)
         adxl345 = racer_imu_init_address(ADXL345_OTHER_ADDRESS);
         if (adxl345)
         {
+            /*
             printf("Racer IMU using alternate address 0x%02x\r\n",
                    ADXL345_OTHER_ADDRESS);
+            */
             fflush(stdout);
         }
     }
@@ -99,7 +101,7 @@ static bool racer_imu_read_raw(int16_t accel[3])
         return true;
     }
 
-    printf("ERROR: failed to read racer IMU acceleration\r\n");
+    /* printf("ERROR: failed to read racer IMU acceleration\r\n"); */
     fflush(stdout);
     return false;
 }
@@ -126,13 +128,13 @@ bool racer_imu_update(void)
     if (! upside_down && (accel[2] <= RACER_IMU_UPSIDE_DOWN_Z))
     {
         upside_down = true;
-        printf("Racer upside down: controls swapped\r\n");
+        /* printf("Racer upside down: controls swapped\r\n"); */
         fflush(stdout);
     }
     else if (upside_down && (accel[2] >= RACER_IMU_UPRIGHT_Z))
     {
         upside_down = false;
-        printf("Racer upright: controls normal\r\n");
+        /* printf("Racer upright: controls normal\r\n"); */
         fflush(stdout);
     }
 
@@ -156,14 +158,16 @@ bool racer_imu_print_readings(void)
     print_ticks = 0;
 
     if (have_accel_reading) {
+        /*
         printf("Racer IMU: X=%d, Y=%d, Z=%d, %s\r\n",
                last_accel[0], last_accel[1], last_accel[2],
                upside_down ? "upside down" : "upright");
+        */
         fflush(stdout);
         return true;
     }
 
-    printf("Waiting for racer IMU to be ready... %d\r\n", ++wait_count);
+    /* printf("Waiting for racer IMU to be ready... %d\r\n", ++wait_count); */
     fflush(stdout);
 
     return false;

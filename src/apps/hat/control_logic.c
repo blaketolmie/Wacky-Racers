@@ -60,13 +60,13 @@ void imu_init(void)
 int read_imu(int16_t accel[3])
 {
     if (!adxl345_is_ready(adxl345)) {
-        printf("Waiting for accelerometer to be ready... %d\n", ++count);
+        /* printf("Waiting for accelerometer to be ready... %d\n", ++count); */
         return 0;
     }
     if (adxl345_accel_read(adxl345, accel)) {
         return 1;
     }
-    printf("ERROR: failed to read acceleration\n");
+    /* printf("ERROR: failed to read acceleration\n"); */
     return 0;
 }
 

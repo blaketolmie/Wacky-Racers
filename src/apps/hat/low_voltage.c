@@ -32,7 +32,7 @@ int get_battery_voltage(void)
     uint16_t data[1];
     adc_read(adc, data, sizeof(data));
     int adc_voltage = (data[0] * 3300 / 4096) * 2;
-    printf("mV: %d\n\r", adc_voltage);
+    /* printf("mV: %d\n\r", adc_voltage); */
     return adc_voltage;
 }
 

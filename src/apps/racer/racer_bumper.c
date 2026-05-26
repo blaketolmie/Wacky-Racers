@@ -52,7 +52,7 @@ bool racer_bumper_update(racer_bumper_t *bumper)
         pushed = true;
         bumper->hbridge_off_ticks = HBRIDGE_OFF_TICKS;
         pio_output_low(HBRIDGE_ENABLE_PIO);
-        printf("Bumper pushed: H-bridge disabled for 5 seconds and STOP requested\r\n");
+        /* printf("Bumper pushed: H-bridge disabled for 5 seconds and STOP requested\r\n"); */
         fflush(stdout);
     }
 
@@ -63,7 +63,7 @@ bool racer_bumper_update(racer_bumper_t *bumper)
         if (bumper->hbridge_off_ticks == 0)
         {
             pio_output_high(HBRIDGE_ENABLE_PIO);
-            printf("H-bridge enabled\r\n");
+            /* printf("H-bridge enabled\r\n"); */
             fflush(stdout);
         }
     }
