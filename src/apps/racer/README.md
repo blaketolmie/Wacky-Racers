@@ -178,12 +178,13 @@ Each loop does roughly this:
 2. Update the heartbeat LED.
 3. Check the low-voltage input.
 4. Check the FPV button.
-5. Check the bumper.
-6. Update the LED tape.
-7. Check the sleep button.
-8. Poll the radio link.
-9. If a valid packet arrives, apply the motor command.
-10. If no valid packet has arrived for too long, stop the motors.
+5. Print racer IMU readings slowly, if the IMU started correctly.
+6. Check the bumper.
+7. Update the LED tape.
+8. Check the sleep button.
+9. Poll the radio link.
+10. If a valid packet arrives, apply the motor command.
+11. If no valid packet has arrived for too long, stop the motors.
 
 The important design idea is that each small module owns one job.  `racer.c`
 acts like the conductor.  It decides when each module gets called, but the
@@ -199,10 +200,11 @@ Important lines:
 
 ```make
 PERIPHERALS = pwm pit
-DRIVERS = usb_serial pacer nrf24 button panic ledtape
+DRIVERS = usb_serial pacer nrf24 button panic ledtape adxl345
 SRC = racer.c racer_motors.c radio_link.c racer_sleep.c \
       racer_radio_channel.c racer_low_voltage.c racer_heartbeat.c \
-      racer_bumper.c racer_ledtape.c racer_power.c racer_fpv.c
+      racer_bumper.c racer_ledtape.c racer_power.c racer_fpv.c \
+      racer_imu.c
 ```
 
 `PERIPHERALS` and `DRIVERS` enable library code used by the app.  `SRC` lists
@@ -512,6 +514,31 @@ typedef struct
 That stored `enabled` value matters for sleep.  Sleep mode temporarily turns
 FPV off, but after wakeup the racer can restore the user's chosen FPV state.
 
+### `racer_imu.c` and `racer_imu.h`
+
+These files read the racer ADXL345 accelerometer and print debug readings to
+USB serial.
+
+`racer_imu_init()`:
+
+- powers the IMU using `IMU_ENABLE_PIO`,
+- waits for the IMU power to settle,
+- starts the TWI/I2C bus,
+- checks that the ADXL345 answers at `ADXL345_ADDRESS`,
+- tries the other legal ADXL345 address if the configured one does not answer,
+- returns `0` if the IMU is ready.
+
+The racer can still drive if the IMU does not initialise.  That is deliberate:
+the IMU is debug information on the racer, while the radio and motor code are
+the important race-control path.
+
+`racer_imu_print_readings()` is called every main-loop tick, but it only prints
+about once per second.  Printing every 10 ms would flood USB serial and could
+slow down radio receiving and motor control.
+
+After sleep, the racer powers the IMU back on and runs `racer_imu_init()` again
+because the ADXL345 loses its setup when power is removed.
+
 ### `racer_radio_channel.c` and `racer_radio_channel.h`
 
 These files read the DIP switches and turn them into a fixed radio channel.
@@ -627,6 +654,13 @@ If low voltage does not work:
 - Check `PGOOD_PIO` if the board uses it.
 - Remember the monitor input is active-low.
 - Remember PB5 needs JTAG disabled, which this code does in init.
+
+If the racer IMU does not print readings:
+
+- Check that `ADXL345_ADDRESS` in the racer board `target.h` matches the board.
+- Check IMU power on `IMU_ENABLE_PIO`.
+- Check the TWI/I2C wiring.
+- Look for `Racer IMU disabled, init error ...` on USB serial.
 
 ## When Editing This App
 

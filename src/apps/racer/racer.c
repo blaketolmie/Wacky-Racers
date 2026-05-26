@@ -319,6 +319,7 @@ int main(void)
     uint8_t radio_channel;
     uint8_t current_radio_channel = 0xffu;
     uint32_t now_ms = 0;
+    bool imu_enabled = false;
     int error;
 
     /* Turn on board power rails and configure simple status systems first. */
@@ -358,7 +359,16 @@ int main(void)
     if (error)
         panic(LED_ERROR_PIO, 9);
 
-    racer_imu_init();
+    error = racer_imu_init();
+    if (error)
+    {
+        printf("Racer IMU disabled, init error %d\r\n", error);
+        fflush(stdout);
+    }
+    else
+    {
+        imu_enabled = true;
+    }
 
     button_poll_count_set(BUTTON_POLL_COUNT(BUTTON_POLL_RATE));
     pacer_init(BUTTON_POLL_RATE);
@@ -380,7 +390,8 @@ int main(void)
         racer_heartbeat_update();
         racer_low_voltage_update();
         racer_fpv_update(&fpv);
-        racer_imu_print_readings();
+        if (imu_enabled)
+            racer_imu_print_readings();
 
         /*
            The bumper returns true only on the first press.  Its active state
@@ -408,6 +419,13 @@ int main(void)
             racer_power_sleep_enter();
             racer_sleep_wait_for_wake(&sleep);
             racer_power_sleep_exit();
+            error = racer_imu_init();
+            imu_enabled = error == 0;
+            if (error)
+            {
+                printf("Racer IMU disabled after wake, init error %d\r\n", error);
+                fflush(stdout);
+            }
             racer_fpv_apply(&fpv);
             racer_bumper_reset(&bumper);
             racer_ledtape_bumper_set(&ledtape, false);

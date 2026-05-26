@@ -83,6 +83,7 @@
 #define IMU_ENABLE_PIO PA10_PIO     /* Pin 29 */
 #define IMU_INT1_PIO PA6_PIO        /* Pin 34 */
 #define IMU_INT2_PIO PA11_PIO       /* Pin 28 */
+#define ADXL345_ADDRESS 0x1D        /* ADXL345 I2C address, same as the hat */
 
 /* Other inputs / outputs */
 #define BUMPER_PIO PA28_PIO         /* Pin 38 */
