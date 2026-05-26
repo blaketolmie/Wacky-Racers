@@ -298,14 +298,27 @@ static void print_startup(void)
 }
 
 static void process_radio_command(racer_motors_t *motors,
-                                  const link_control_packet_t *packet)
+                                  const link_control_packet_t *packet,
+                                  bool controls_flipped)
 {
+    int8_t left_pwm = packet->left_pwm;
+    int8_t right_pwm = packet->right_pwm;
+
     /* The packet has already passed all link checks before this function. */
-    printf("RX counter %lu: %d %d\r\n",
+    if (controls_flipped)
+    {
+        int8_t old_left_pwm = left_pwm;
+
+        left_pwm = right_pwm;
+        right_pwm = old_left_pwm;
+    }
+
+    printf("RX counter %lu%s: %d %d\r\n",
            (unsigned long)packet->counter,
-           packet->left_pwm,
-           packet->right_pwm);
-    racer_motors_set(motors, packet->left_pwm, packet->right_pwm);
+           controls_flipped ? " flipped" : "",
+           left_pwm,
+           right_pwm);
+    racer_motors_set(motors, left_pwm, right_pwm);
 }
 
 int main(void)
@@ -391,7 +404,10 @@ int main(void)
         racer_low_voltage_update();
         racer_fpv_update(&fpv);
         if (imu_enabled)
+        {
+            racer_imu_update();
             racer_imu_print_readings();
+        }
 
         /*
            The bumper returns true only on the first press.  Its active state
@@ -447,7 +463,8 @@ int main(void)
 
         if (link_poll(nrf, &packet, &current_radio_channel, now_ms))
         {
-            process_radio_command(&motors, &packet);
+            process_radio_command(&motors, &packet,
+                                  imu_enabled && racer_imu_is_upside_down());
 
             /*
                The racer only advances/resyncs after a valid packet, so old

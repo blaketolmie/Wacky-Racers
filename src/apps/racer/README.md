@@ -178,7 +178,7 @@ Each loop does roughly this:
 2. Update the heartbeat LED.
 3. Check the low-voltage input.
 4. Check the FPV button.
-5. Print racer IMU readings slowly, if the IMU started correctly.
+5. Update racer IMU orientation and print readings slowly, if the IMU started correctly.
 6. Check the bumper.
 7. Update the LED tape.
 8. Check the sleep button.
@@ -516,8 +516,9 @@ FPV off, but after wakeup the racer can restore the user's chosen FPV state.
 
 ### `racer_imu.c` and `racer_imu.h`
 
-These files read the racer ADXL345 accelerometer and print debug readings to
-USB serial.
+These files read the racer ADXL345 accelerometer.  The racer uses the IMU to
+notice when the car is upside down, and also prints slow debug readings to USB
+serial.
 
 `racer_imu_init()`:
 
@@ -531,6 +532,17 @@ USB serial.
 The racer can still drive if the IMU does not initialise.  That is deliberate:
 the IMU is debug information on the racer, while the radio and motor code are
 the important race-control path.
+
+`racer_imu_update()` is called every main-loop tick.  It reads the latest
+accelerometer value and updates the stored upright/upside-down state.  When the
+Z axis is less than about `-0.5 g`, the racer treats itself as upside down.
+When the Z axis is greater than about `+0.5 g`, it treats itself as upright
+again.  The gap between those two limits is hysteresis, which stops the controls
+from flickering during bumps.
+
+When the racer is upside down, `racer.c` swaps the left and right PWM commands
+before passing them to `racer_motors_set()`.  This means a packet that arrived
+as `left_pwm, right_pwm` is applied as `right_pwm, left_pwm` after a rollover.
 
 `racer_imu_print_readings()` is called every main-loop tick, but it only prints
 about once per second.  Printing every 10 ms would flood USB serial and could
@@ -661,6 +673,12 @@ If the racer IMU does not print readings:
 - Check IMU power on `IMU_ENABLE_PIO`.
 - Check the TWI/I2C wiring.
 - Look for `Racer IMU disabled, init error ...` on USB serial.
+
+If the upside-down steering is backwards:
+
+- Watch the printed `Racer IMU: ... Z=...` value while the racer is upright and upside down.
+- The current code assumes upright gives positive Z and upside down gives negative Z.
+- If your mounted IMU is the other way around, swap the signs of `RACER_IMU_UPSIDE_DOWN_Z` and `RACER_IMU_UPRIGHT_Z` in `racer_imu.c`.
 
 ## When Editing This App
 
