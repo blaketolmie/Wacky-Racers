@@ -18,6 +18,7 @@
 #include "panic.h"
 #include "target.h"
 #include "delay.h"
+#include "mcu.h"
 #include "racer_motors.h"
 #include "radio_link.h"
 #include "racer_sleep.h"
@@ -308,6 +309,24 @@ static void process_radio_command(racer_motors_t *motors,
     racer_motors_set(motors, left_pwm, right_pwm);
 }
 
+static void racer_restart_for_link_loss(racer_motors_t *motors)
+{
+    /*
+       The short failsafe stops the motors.  This longer timeout is a recovery
+       tool: if the radio link has been silent for several seconds, restart
+       the MCU so the radio, counters, and scan state begin from a clean setup.
+    */
+    racer_motors_stop(motors);
+    printf("No valid radio packet for %u ms, restarting racer\r\n",
+           RACER_LINK_RESTART_MS);
+    fflush(stdout);
+
+    mcu_reset();
+
+    while (1)
+        ;
+}
+
 int main(void)
 {
     racer_motors_t motors;
@@ -473,6 +492,9 @@ int main(void)
             racer_motors_stop(&motors);
             link_synced = false;
         }
+
+        if ((uint32_t)(now_ms - last_valid_packet_ms) >= RACER_LINK_RESTART_MS)
+            racer_restart_for_link_loss(&motors);
     }
 
     return 0;

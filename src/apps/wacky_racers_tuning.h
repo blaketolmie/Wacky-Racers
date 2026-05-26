@@ -20,6 +20,7 @@
 #define LINK_RESYNC_LOOKAHEAD    60u
 #define LINK_RESYNC_DWELL_MS     10u
 #define LINK_RESYNC_GRACE_MS     120u
+#define RACER_LINK_RESTART_MS    5000u
 #define LINK_SECRET              0x5A3C9E27u
 
 /*

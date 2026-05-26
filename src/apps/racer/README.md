@@ -60,6 +60,7 @@ For the racer, the most useful values are:
 | `RACER_IMU_UPSIDE_DOWN_Z` | Z-axis threshold for treating the racer as upside down. |
 | `RACER_IMU_UPRIGHT_Z` | Z-axis threshold for treating the racer as upright again. |
 | `LINK_FAILSAFE_MS` | How long without a valid packet before the racer stops. |
+| `RACER_LINK_RESTART_MS` | How long without a valid packet before the racer fully restarts. |
 
 The current defaults make the racer more reactive by applying a `115%` motor
 command gain and a small minimum non-zero command of `12`.
@@ -620,6 +621,18 @@ off, blocked, or out of range.
 
 The failsafe looks at valid packets only.  Bad packets do not reset the failsafe
 timer.
+
+There is also a longer restart recovery:
+
+```text
+if no valid packet has arrived for 5000 ms, restart the racer MCU
+```
+
+This is different from the motor failsafe.  The 500 ms failsafe is for safety.
+The 5000 ms restart is for recovery if the radio or counter state gets stuck
+after the racer board is turned off, reset, or otherwise loses the link.  The
+restart runs `main()` again, so the radio and resync scan start from a clean
+state.
 
 ## Useful Serial Output
 
