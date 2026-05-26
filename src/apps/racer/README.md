@@ -42,12 +42,34 @@ The channel hop is also based on the counter.  That means the hat and racer
 move through the same channel table at the same time, without needing to send a
 separate "next channel" message.
 
+## Tuning File
+
+Most race-day tuning values are in:
+
+```text
+src/apps/wacky_racers_tuning.h
+```
+
+For the racer, the most useful values are:
+
+| Tuning value | What it changes |
+| --- | --- |
+| `RACER_DRIVE_GAIN_PERCENT` | Makes motor commands stronger before they reach the motor driver. |
+| `RACER_DRIVE_MIN_COMMAND` | Minimum non-zero command, useful for overcoming motor deadband. |
+| `RACER_MOTOR_PWM_FREQ_HZ` | PWM frequency used for the H-bridge inputs. |
+| `RACER_IMU_UPSIDE_DOWN_Z` | Z-axis threshold for treating the racer as upside down. |
+| `RACER_IMU_UPRIGHT_Z` | Z-axis threshold for treating the racer as upright again. |
+| `LINK_FAILSAFE_MS` | How long without a valid packet before the racer stops. |
+
+The current defaults make the racer more reactive by applying a `115%` motor
+command gain and a small minimum non-zero command of `12`.
+
 ## Current Radio Behaviour
 
 The current racer app uses counter-based channel hopping, not a single fixed
 DIP-switch channel.
 
-Important constants are in `racer.c`:
+Important radio constants are in `src/apps/wacky_racers_tuning.h`:
 
 ```c
 #define LINK_TX_PERIOD_MS        20u
@@ -678,13 +700,16 @@ If the upside-down steering is backwards:
 
 - Watch the printed `Racer IMU: ... Z=...` value while the racer is upright and upside down.
 - The current code assumes upright gives positive Z and upside down gives negative Z.
-- If your mounted IMU is the other way around, swap the signs of `RACER_IMU_UPSIDE_DOWN_Z` and `RACER_IMU_UPRIGHT_Z` in `racer_imu.c`.
+- If your mounted IMU is the other way around, swap the signs of `RACER_IMU_UPSIDE_DOWN_Z` and `RACER_IMU_UPRIGHT_Z` in `src/apps/wacky_racers_tuning.h`.
 
 ## When Editing This App
 
-If you change the radio packet format, IDs, secret, or hop table in `racer.c`,
-you must make the same matching change in `hat.c`.  The two boards must agree
-exactly, or the racer will reject the hat's packets.
+If you change the radio packet format, IDs, secret, or hop table, make sure the
+hat and racer still agree exactly.  The shared tuning file is the normal place
+for those shared values.
+
+For normal tuning, change `src/apps/wacky_racers_tuning.h` first.  That keeps
+the hat and racer shared radio values together.
 
 If you change motor behaviour, try to keep the public interface simple:
 

@@ -8,14 +8,13 @@
 #include "pio.h"
 #include "delay.h"
 #include "target.h"
+#include "../wacky_racers_tuning.h"
 
 #ifndef ADXL345_ADDRESS
 #error ADXL345_ADDRESS must be defined
 #endif
 
 #define RACER_IMU_PRINT_TICKS 100
-#define RACER_IMU_UPSIDE_DOWN_Z -125
-#define RACER_IMU_UPRIGHT_Z 125
 #define ADXL345_OTHER_ADDRESS \
     ((ADXL345_ADDRESS == 0x1D) ? 0x53 : 0x1D)
 

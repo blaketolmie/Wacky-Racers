@@ -20,12 +20,34 @@ The hat does four main things:
 The racer receives the packet and decides whether to trust it.  The hat and
 racer must agree on the packet format, IDs, secret, and hop table.
 
+## Tuning File
+
+Most race-day tuning values are in:
+
+```text
+src/apps/wacky_racers_tuning.h
+```
+
+For the hat, the most useful values are:
+
+| Tuning value | What it changes |
+| --- | --- |
+| `HAT_CONTROL_X_SCALE` | Steering sensitivity.  Smaller means more steering for the same tilt. |
+| `HAT_CONTROL_Y_SCALE` | Throttle sensitivity.  Smaller means more speed for the same tilt. |
+| `HAT_CONTROL_DEADZONE` | How much small IMU noise is ignored near centre. |
+| `LINK_TX_PERIOD_MS` | How often the hat sends a control packet. |
+| `LINK_PACKETS_PER_HOP` | How many packets stay on one radio channel. |
+
+The current defaults keep the original working hat control feel.  Extra
+responsiveness is applied on the racer motor side instead, so the controller
+mapping stays familiar.
+
 ## Current Radio Behaviour
 
 The current hat app uses counter-based channel hopping.  It does not send all
 packets on one fixed channel.
 
-Important constants are in `hat.c`:
+Important radio constants are in `src/apps/wacky_racers_tuning.h`:
 
 ```c
 #define LINK_TX_PERIOD_MS        20u
@@ -313,10 +335,10 @@ multiplies by 2 to estimate the original voltage.
 `low_power(true)` toggles the red LED as a warning.  `low_power(false)` turns
 the warning off.
 
-In `hat.c`, low voltage is checked against:
+Low voltage is checked against this tuning value:
 
 ```c
-#define VOLTAGE_THRESHHOLD 5000
+#define HAT_LOW_VOLTAGE_THRESHOLD_MV 5000
 ```
 
 So the warning starts when the measured battery estimate is at or below about
@@ -463,13 +485,16 @@ If low voltage looks wrong:
 
 - Check the ADC channel and voltage divider.
 - Check whether the battery divider really divides by 2.
-- Check the `VOLTAGE_THRESHHOLD` value in `hat.c`.
+- Check `HAT_LOW_VOLTAGE_THRESHOLD_MV` in `src/apps/wacky_racers_tuning.h`.
 
 ## When Editing This App
 
-If you change the radio packet format, hop table, IDs, or secret in `hat.c`,
-make the same change in `racer.c`.  The racer rejects packets unless both sides
-agree exactly.
+If you change the radio packet format, hop table, IDs, or secret, make sure the
+hat and racer still agree exactly.  The shared tuning file is the normal place
+for those shared values.
+
+For normal tuning, change `src/apps/wacky_racers_tuning.h` first.  That keeps
+the hat and racer shared radio values together.
 
 If you change how controls are calculated, try to keep `get_pwm()` returning the
 same simple interface:

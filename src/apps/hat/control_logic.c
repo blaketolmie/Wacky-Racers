@@ -14,6 +14,8 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "../wacky_racers_tuning.h"
+
 
 /*
  * NOTE: you must define ADXL345_ADDRESS in target.h for this to compile.
@@ -77,24 +79,24 @@ void get_pwm(int *left, int *right)
         return;
     }
 
-    float x = accel[0] / 2.6f;
-    float y = accel[1] / 2.6f;
+    float x = accel[0] / HAT_CONTROL_X_SCALE;
+    float y = accel[1] / HAT_CONTROL_Y_SCALE;
 
-    // Clamp to ±100
-    if (x > 100.0f)  x = 100.0f;
-    if (x < -100.0f) x = -100.0f;
-    if (y > 100.0f)  y = 100.0f;
-    if (y < -100.0f) y = -100.0f;
+    // Clamp to +/-100
+    if (x > HAT_CONTROL_PWM_LIMIT)  x = HAT_CONTROL_PWM_LIMIT;
+    if (x < -HAT_CONTROL_PWM_LIMIT) x = -HAT_CONTROL_PWM_LIMIT;
+    if (y > HAT_CONTROL_PWM_LIMIT)  y = HAT_CONTROL_PWM_LIMIT;
+    if (y < -HAT_CONTROL_PWM_LIMIT) y = -HAT_CONTROL_PWM_LIMIT;
 
     // Deadzone
-    if (fabsf(x) < 3.85f) x = 0.0f;
-    if (fabsf(y) < 3.85f) y = 0.0f;
+    if (fabsf(x) < HAT_CONTROL_DEADZONE) x = 0.0f;
+    if (fabsf(y) < HAT_CONTROL_DEADZONE) y = 0.0f;
 
     *left  = (int)(y + x);
     *right = (int)(y - x);
 
-    if (*left > 100)   *left = 100;
-    if (*left < -100)  *left = -100;
-    if (*right > 100)  *right = 100;
-    if (*right < -100) *right = -100;
+    if (*left > HAT_CONTROL_PWM_LIMIT)   *left = HAT_CONTROL_PWM_LIMIT;
+    if (*left < -HAT_CONTROL_PWM_LIMIT)  *left = -HAT_CONTROL_PWM_LIMIT;
+    if (*right > HAT_CONTROL_PWM_LIMIT)  *right = HAT_CONTROL_PWM_LIMIT;
+    if (*right < -HAT_CONTROL_PWM_LIMIT) *right = -HAT_CONTROL_PWM_LIMIT;
 }

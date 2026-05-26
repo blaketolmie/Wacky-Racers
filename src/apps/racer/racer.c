@@ -28,6 +28,7 @@
 #include "racer_power.h"
 #include "racer_fpv.h"
 #include "racer_imu.h"
+#include "../wacky_racers_tuning.h"
 
 /* The main loop runs 100 times per second, so one loop tick is 10 ms. */
 #define BUTTON_POLL_RATE 100
@@ -40,18 +41,6 @@
    This does not stop deliberate wideband jamming, but it stops simple
    record-and-loop replay from being accepted as fresh control data.
 */
-#define LINK_VERSION             1u
-#define LINK_HAT_ID              0xA1u
-#define LINK_RACER_ID            0xB2u
-#define LINK_MSG_CONTROL         0x01u
-#define LINK_TX_PERIOD_MS        20u
-#define LINK_PACKETS_PER_HOP     10u
-#define LINK_FAILSAFE_MS         500u
-#define LINK_RESYNC_LOOKAHEAD    60u
-#define LINK_RESYNC_DWELL_MS     10u
-#define LINK_RESYNC_GRACE_MS     120u
-#define LINK_SECRET              0x5A3C9E27u
-
 /*
    These are the only RF channels the racer will use.  The hat uses the same
    table.  Channels 1-10 are left unused.  These channels are spaced 4 MHz
@@ -59,9 +48,7 @@
    channel.  The counter chooses the channel, so both boards hop together.
 */
 static const uint8_t link_hop_table[] = {
-    11, 43, 75, 27, 59, 15,
-    47, 79, 31, 63, 19, 51,
-    23, 55, 35, 67, 39, 71
+    LINK_HOP_TABLE_VALUES
 };
 
 /*

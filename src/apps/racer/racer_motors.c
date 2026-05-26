@@ -10,16 +10,17 @@
 #include "racer_motors.h"
 #include "pio.h"
 #include "target.h"
+#include "../wacky_racers_tuning.h"
 
 #define LEFT_PWM_PIO    MOTOR_LEFT_PWM_PIO
 #define LEFT_DIR_PIO    MOTOR_LEFT_DIR_PIO
 #define RIGHT_PWM_PIO   MOTOR_RIGHT_PWM_PIO
 #define RIGHT_DIR_PIO   MOTOR_RIGHT_DIR_PIO
 
-#define PWM_FREQ_HZ 500
+#define PWM_FREQ_HZ RACER_MOTOR_PWM_FREQ_HZ
 
 #define DUTY_MIN 0
-#define DUTY_MAX 100
+#define DUTY_MAX RACER_DRIVE_MAX_COMMAND
 
 /* PWM setup for the left motor output pin.  The duty starts at 0 percent. */
 static const pwm_cfg_t left_pwm_cfg =
@@ -61,6 +62,30 @@ static int abs_int(int value)
         return -value;
 
     return value;
+}
+
+static int racer_motors_tune_command(int value)
+{
+    int sign = 1;
+    int magnitude;
+
+    value = clamp(value, -RACER_DRIVE_MAX_COMMAND, RACER_DRIVE_MAX_COMMAND);
+    if (value == 0)
+        return 0;
+
+    if (value < 0)
+        sign = -1;
+
+    magnitude = abs_int(value);
+    magnitude = (magnitude * RACER_DRIVE_GAIN_PERCENT) / 100;
+
+    if (magnitude < RACER_DRIVE_MIN_COMMAND)
+        magnitude = RACER_DRIVE_MIN_COMMAND;
+
+    if (magnitude > RACER_DRIVE_MAX_COMMAND)
+        magnitude = RACER_DRIVE_MAX_COMMAND;
+
+    return sign * magnitude;
 }
 
 int racer_motors_init(racer_motors_t *motors)
@@ -114,8 +139,8 @@ void racer_motors_set(racer_motors_t *motors,
     int left_duty;
     int right_duty;
 
-    left_command = clamp(left_command, -100, 100);
-    right_command = clamp(right_command, -100, 100);
+    left_command = racer_motors_tune_command(left_command);
+    right_command = racer_motors_tune_command(right_command);
 
     /*
        The sign chooses direction.  The absolute value chooses speed.

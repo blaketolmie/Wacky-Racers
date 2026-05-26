@@ -13,6 +13,7 @@
 #include "ledbuffer.h"
 #include "low_voltage.h"
 #include "mcu_sleep.h"
+#include "../wacky_racers_tuning.h"
 
 /*
    This packet format and these constants must match racer.c.
@@ -21,26 +22,12 @@
    This does not stop deliberate wideband jamming, but it stops simple
    record-and-loop replay from being accepted as fresh control data.
 */
-#define LINK_VERSION             1u
-#define LINK_HAT_ID              0xA1u
-#define LINK_RACER_ID            0xB2u
-#define LINK_MSG_CONTROL         0x01u
-#define LINK_TX_PERIOD_MS        20u
-#define LINK_PACKETS_PER_HOP     10u
-#define LINK_FAILSAFE_MS         500u
-#define LINK_RESYNC_LOOKAHEAD    60u
-#define LINK_RESYNC_DWELL_MS     10u
-#define LINK_RESYNC_GRACE_MS     120u
-#define LINK_SECRET              0x5A3C9E27u
-
 /*
    Channels 1-10 are left unused.  These channels are spaced 4 MHz apart,
    then ordered so each hop moves well away from the previous RF channel.
 */
 static const uint8_t link_hop_table[] = {
-    11, 43, 75, 27, 59, 15,
-    47, 79, 31, 63, 19, 51,
-    23, 55, 35, 67, 39, 71
+    LINK_HOP_TABLE_VALUES
 };
 
 static uint8_t link_current_channel = 0xffu;
@@ -108,11 +95,11 @@ static bool link_check_packet(const link_control_packet_t *packet)
 
 static int8_t link_pwm_to_int8(int pwm)
 {
-    if (pwm > 100)
-        return 100;
+    if (pwm > HAT_CONTROL_PWM_LIMIT)
+        return HAT_CONTROL_PWM_LIMIT;
 
-    if (pwm < -100)
-        return -100;
+    if (pwm < -HAT_CONTROL_PWM_LIMIT)
+        return -HAT_CONTROL_PWM_LIMIT;
 
     return (int8_t)pwm;
 }
@@ -163,10 +150,6 @@ static void print_startup(void)
 #define TRANSMIT_PWM_TICKS ((int)(PACER_RATE * LINK_TX_PERIOD_MS / 1000))
 #define LED_STRIP_TICKS (PACER_RATE/LED_STRIP_FREQUENCY)
 #define LOW_VOLTAGE_TICKS (PACER_RATE/LOW_VOLTAGE_FREQUENCY)
-
-// Misc. Definitions
-#define VOLTAGE_THRESHHOLD 5000
-
 
 int main(void)
 {
@@ -331,7 +314,7 @@ int main(void)
         // Low Voltage
         if (low_voltage_ticks++ >= LOW_VOLTAGE_TICKS)
         {
-            if (get_battery_voltage() <= VOLTAGE_THRESHHOLD)
+            if (get_battery_voltage() <= HAT_LOW_VOLTAGE_THRESHOLD_MV)
             {
                 low_power(true);
             }
