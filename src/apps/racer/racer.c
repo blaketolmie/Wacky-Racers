@@ -27,6 +27,7 @@
 #include "racer_ledtape.h"
 #include "racer_power.h"
 #include "racer_fpv.h"
+#include "racer_imu.h"
 
 /* The main loop runs 100 times per second, so one loop tick is 10 ms. */
 #define BUTTON_POLL_RATE 100
@@ -357,6 +358,8 @@ int main(void)
     if (error)
         panic(LED_ERROR_PIO, 9);
 
+    racer_imu_init();
+
     button_poll_count_set(BUTTON_POLL_COUNT(BUTTON_POLL_RATE));
     pacer_init(BUTTON_POLL_RATE);
 
@@ -377,6 +380,7 @@ int main(void)
         racer_heartbeat_update();
         racer_low_voltage_update();
         racer_fpv_update(&fpv);
+        racer_imu_print_readings();
 
         /*
            The bumper returns true only on the first press.  Its active state
