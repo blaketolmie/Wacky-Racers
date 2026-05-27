@@ -41,6 +41,7 @@
    Racer-side motor tuning below can make the car feel punchier without
    changing the controller's IMU mapping.
 */
+/* Steering sensitivity: increase this if steering feels too twitchy. */
 #define HAT_CONTROL_X_SCALE      2.6f
 #define HAT_CONTROL_Y_SCALE      2.6f
 #define HAT_CONTROL_DEADZONE     3.85f

@@ -301,8 +301,8 @@ static void process_radio_command(racer_motors_t *motors,
     {
         int8_t old_left_pwm = left_pwm;
 
-        left_pwm = right_pwm;
-        right_pwm = old_left_pwm;
+        left_pwm = -right_pwm;
+        right_pwm = -old_left_pwm;
     }
 
     /*
